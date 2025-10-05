@@ -4,3 +4,4 @@ dist
 .DS_Store
 .vscode
 maxlove_history.json
+src/commands/slash/maxtestdaily.ts

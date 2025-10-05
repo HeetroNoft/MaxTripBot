@@ -1,12 +1,12 @@
 import { DateTime } from "luxon";
 import dotenv from "dotenv";
+import { SlashCommandBuilder } from "discord.js";
 
 dotenv.config();
 
-export const data = {
-  name: "maxdate",
-  description: "Affiche la date de départ de Maxime pour l’Australie",
-};
+export const data = new SlashCommandBuilder()
+  .setName("maxdate")
+  .setDescription("Affiche la date de départ de Maxime pour l’Australie");
 
 export const aliases = ["maxdate", "maxstart", "maxdepart"];
 

@@ -1,13 +1,13 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
   getMaxLoveCount,
   getMaxLoveLeaderboard,
 } from "../../utils/maxLoveManager";
 
-export const data = {
-  name: "maxstats",
-  description: "Affiche le nombre de MaxLove envoyés",
-};
+export const data = new SlashCommandBuilder()
+  .setName("maxstats")
+  .setDescription("Affiche le nombre de MaxLove envoyés");
+
 export const aliases = ["maxstats"];
 
 export async function execute({

@@ -1,11 +1,11 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import fs from "fs";
 import path from "path";
 
-export const data = {
-  name: "maxhelp",
-  description: "Affiche la liste des commandes",
-};
+export const data = new SlashCommandBuilder()
+  .setName("maxhelp")
+  .setDescription("Affiche la liste des commandes");
+
 export const aliases = ["maxhelp"];
 
 export async function execute({

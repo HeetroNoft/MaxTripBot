@@ -10,10 +10,6 @@ export const data = new SlashCommandBuilder()
   .setName("maxlove")
   .setDescription("Un peu d'amour pour Maxime ! (⏱ 1h)");
 
-/* {
-  name: "maxlove",
-  description: "Un peu d'amour pour Maxime ! (⏱ 1h)",
-}; */
 export const aliases = ["maxlove"];
 
 export async function execute({

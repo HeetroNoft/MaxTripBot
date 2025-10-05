@@ -1,9 +1,9 @@
+import { SlashCommandBuilder } from "discord.js";
 import { dailyMaximeMessage } from "../../utils/dailyMessage";
 
-export const data = {
-  name: "maxtestdaily",
-  description: "Envoie un message de test du daily MaxTripBot",
-};
+export const data = new SlashCommandBuilder()
+  .setName("maxtestdaily")
+  .setDescription("Envoie un message de test du daily MaxTripBot");
 
 export const aliases = ["maxtestdaily"];
 

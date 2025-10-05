@@ -1,10 +1,10 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { DateTime } from "luxon";
 
-export const data = {
-  name: "maxtime",
-  description: "Affiche l'heure Australie / France et la différence",
-};
+export const data = new SlashCommandBuilder()
+  .setName("maxtime")
+  .setDescription("Affiche l'heure Australie / France et la différence");
+
 export const aliases = ["maxtime"];
 
 export async function execute({
