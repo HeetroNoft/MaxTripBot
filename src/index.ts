@@ -7,7 +7,7 @@ import { ExtendedClient } from "./types/ExtendedClient";
 import { loadSlashCommands } from "./utils/logger";
 import { dailyMaximeMessage } from "./utils/dailyMessage";
 
-dotenv.config();
+dotenv.config({ path: ".env" });
 
 const client = new Client({
   intents: [
