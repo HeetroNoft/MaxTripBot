@@ -13,7 +13,7 @@ dotenv.config();
  */
 export async function dailyMaximeMessage(client: Client) {
   const total = getMaxLoveCount();
-  const channelId = "702985266209620018"; // process.env.DAILY_CHANNEL_ID
+  const channelId = process.env.DAILY_CHANNEL_ID; // process.env.DAILY_CHANNEL_ID
   const departISO = process.env.MAX_DEPART;
 
   if (!channelId || !departISO) {
