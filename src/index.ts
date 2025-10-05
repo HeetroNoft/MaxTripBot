@@ -49,7 +49,7 @@ client.prefix = process.env.PREFIX || "!";
         await interaction.reply({
           content:
             "Une erreur est survenue lors de l'exécution de la commande.",
-          ephemeral: true,
+          flags: 64,
         });
       }
     }

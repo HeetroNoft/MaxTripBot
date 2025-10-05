@@ -17,7 +17,7 @@ export async function execute({ interaction, message }: any) {
     const errorText =
       "❌ La date de départ n'est pas configurée dans le fichier .env.";
     if (interaction)
-      return interaction.reply({ content: errorText, ephemeral: true });
+      return interaction.reply({ content: errorText, flags: 64 });
     if (message) return message.reply(errorText);
     return;
   }

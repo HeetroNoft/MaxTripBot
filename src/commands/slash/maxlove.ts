@@ -47,8 +47,7 @@ export async function execute({
       )
       .setFooter({ text: "MaxTripBot • Patience !" });
 
-    if (interaction)
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+    if (interaction) return interaction.reply({ embeds: [embed], flags: 64 });
     else return message?.reply({ embeds: [embed] });
   }
 
@@ -64,8 +63,7 @@ export async function execute({
       )
       .setFooter({ text: "MaxTripBot • Patience !" });
 
-    if (interaction)
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+    if (interaction) return interaction.reply({ embeds: [embed], flags: 64 });
     else return message?.reply({ embeds: [embed] });
   }
 
