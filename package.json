@@ -7,7 +7,8 @@
     "start": "node dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
-    "deploy": "ts-node src/deploy-commands.ts"
+    "deploy": "ts-node src/deploy-commands.ts",
+    "update": "git pull origin main && npm install && npm run build && pm2 restart maxtripbot"
   },
   "keywords": [],
   "author": "Heet",
