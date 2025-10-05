@@ -8,12 +8,12 @@ import { getMaxLoveCount } from "./maxLoveManager";
 dotenv.config();
 
 /**
- * Envoie un message quotidien indiquant le nombre de jours depuis le départ de Maxime.
+ * Envoie un message quotidien indiquant le nombre de jours depuis (ou avant) le départ de Maxime.
  * Une phrase aléatoire est sélectionnée à partir du fichier JSON.
  */
 export async function dailyMaximeMessage(client: Client) {
   const total = getMaxLoveCount();
-  const channelId = process.env.DAILY_CHANNEL_ID; // process.env.DAILY_CHANNEL_ID
+  const channelId = process.env.DAILY_CHANNEL_ID;
   const departISO = process.env.MAX_DEPART;
 
   if (!channelId || !departISO) {
@@ -28,14 +28,14 @@ export async function dailyMaximeMessage(client: Client) {
   }
 
   // 🗂️ Charger les phrases du fichier JSON
-  const messagesPath = path.join(__dirname, "../../data/daily_messages.json");
+  const messagesPath = path.join(__dirname, "../../data/dailyMessages.json");
   let phrases: string[] = [];
 
   try {
     const data = fs.readFileSync(messagesPath, "utf8");
     phrases = JSON.parse(data).messages;
   } catch (error) {
-    console.error("❌ Impossible de lire daily_messages.json :", error);
+    console.error("❌ Impossible de lire dailyMessages.json :", error);
   }
 
   // 🎲 Choisir une phrase aléatoire
@@ -59,14 +59,19 @@ export async function dailyMaximeMessage(client: Client) {
   let messageText: string;
 
   if (diffDays < 0) {
-    // Avant le départ
-    messageText = `📅 **Message du jour — MaxTripBot**\n\n<@328795495936032768> n’est pas encore parti pour l’Australie 🇦🇺\n\nDépart prévu le **${formattedDepartDate}**.`;
+    // Avant le départ → afficher le nombre de jours restants
+    const daysRemaining = Math.abs(diffDays);
+    messageText = `📅 **Message du jour — MaxTripBot**\n\n<@328795495936032768> n’est pas encore parti pour l’Australie 🇦🇺\nIl reste **${daysRemaining} jour${
+      daysRemaining > 1 ? "s" : ""
+    }** avant le grand départ ! 🛫\n\nDépart prévu le **${formattedDepartDate}**.`;
   } else if (diffDays === 0) {
     // Jour du départ
-    messageText = `📅 **Message du jour — MaxTripBot**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 !`;
+    messageText = `📅 **Message du jour — MaxTripBot**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 ! Bon vol et bonne aventure !`;
   } else {
     // Après le départ
-    messageText = `📅 **Message du jour — MaxTripBot**\n\nCela fait maintenant **${diffDays} jours** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\n${randomPhrase}\n\nDate de départ : ${formattedDepartDate}`;
+    messageText = `📅 **Message du jour — MaxTripBot**\n\nCela fait maintenant **${diffDays} jour${
+      diffDays > 1 ? "s" : ""
+    }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\n${randomPhrase}\n\nDate de départ : ${formattedDepartDate}`;
   }
 
   await channel.send(messageText);
