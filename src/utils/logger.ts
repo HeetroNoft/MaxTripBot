@@ -10,32 +10,47 @@ export async function loadSlashCommands(client: ExtendedClient) {
   const commandsPath = path.join(__dirname, "../commands/slash");
   const commandFiles = fs
     .readdirSync(commandsPath)
-    .filter((f) => f.endsWith(".ts"));
+    .filter((f) => f.endsWith(".ts") || f.endsWith(".js"));
 
   const commands = [];
 
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
-    const command = await import(filePath);
+    const commandModule = await import(filePath);
+    const command = commandModule.data ?? commandModule.default?.data;
+    if (!command || !command.name) continue;
 
-    if (!command.data || !command.data.name) continue; // sécurité
-    client.commands.set(command.data.name, command);
-    commands.push(command.data); // on push l'objet "data" directement
+    client.commands.set(command.name, command);
+    if (typeof command.toJSON === "function") {
+      commands.push(command.toJSON());
+    } else {
+      commands.push(command);
+    }
   }
 
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
-  try {
-    console.log("🚀 Déploiement des commandes slash...");
-    await rest.put(
-      Routes.applicationGuildCommands(
-        process.env.CLIENT_ID!,
-        process.env.GUILD_IDS!
-      ),
-      { body: commands } // plus besoin de .toJSON()
+  const guildIds =
+    process.env.GUILD_IDS?.split(",").map((id) => id.trim()) || [];
+
+  if (guildIds.length === 0) {
+    console.warn(
+      "⚠️ Aucune GUILD_ID fournie dans .env (GUILD_IDS séparées par des virgules)."
     );
-    console.log("✅ Commandes slash déployées !");
+    return;
+  }
+
+  try {
+    console.log("🚀 Déploiement des commandes slash sur les serveurs...");
+    for (const guildId of guildIds) {
+      await rest.put(
+        Routes.applicationGuildCommands(process.env.CLIENT_ID!, guildId),
+        { body: commands }
+      );
+      console.log(`✅ Commandes slash déployées sur le serveur ${guildId}`);
+    }
+    console.log("🎉 Déploiement terminé sur tous les serveurs !");
   } catch (error) {
-    console.error(error);
+    console.error("❌ Erreur lors du déploiement des commandes :", error);
   }
 }
