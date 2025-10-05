@@ -23,6 +23,6 @@ export function registerEvents(client: Client) {
       }
     );
 
-    console.log("⏰ Message quotidien planifié à 8h (heure de Sydney)");
+    console.log("⏰ Message quotidien planifié à 9h (heure de Sydney)");
   });
 }
