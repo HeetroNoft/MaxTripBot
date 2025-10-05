@@ -8,7 +8,9 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "remove": "ts-node src/remove-commands.ts",
     "deploy": "ts-node src/deploy-commands.ts",
-    "update": "git pull origin main && npm install && tsc && pm2 flush MaxTripBot && pm2 restart MaxTripBot"
+    "update": "git pull origin main && npm install && tsc && pm2 flush MaxTripBot && pm2 restart MaxTripBot",
+    "logs": "pm2 logs MaxTripBot",
+    "stop": "pm2 stop MaxTripBot"
   },
   "keywords": [],
   "author": "Heet",
