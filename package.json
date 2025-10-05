@@ -6,11 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "tsc",
     "remove": "ts-node src/remove-commands.ts",
     "deploy": "ts-node src/deploy-commands.ts",
-    "update": "git pull origin main && npm install",
-    "restart": "pm2 restart MaxTripBot"
+    "update": "git pull origin main && npm install && tsc && pm2 restart MaxTripBot"
   },
   "keywords": [],
   "author": "Heet",
