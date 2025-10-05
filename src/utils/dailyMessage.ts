@@ -1,12 +1,8 @@
 import { TextChannel, Client } from "discord.js";
 import { DateTime } from "luxon";
-import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { getMaxLoveCount } from "./maxLoveManager";
-
-dotenv.config();
-
 /**
  * Envoie un message quotidien indiquant le nombre de jours depuis (ou avant) le départ de Maxime.
  * Une phrase aléatoire est sélectionnée à partir du fichier JSON.

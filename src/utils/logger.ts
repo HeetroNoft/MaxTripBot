@@ -1,10 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { REST, Routes } from "discord.js";
-import dotenv from "dotenv";
 import type { ExtendedClient } from "../types/ExtendedClient";
-
-dotenv.config();
 
 export async function loadSlashCommands(client: ExtendedClient) {
   const commandsPath = path.join(__dirname, "../commands/slash");
