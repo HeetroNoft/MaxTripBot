@@ -1,4 +1,4 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
   addMaxLove,
   getMaxLoveCount,
@@ -6,10 +6,14 @@ import {
   getCooldownRemaining,
 } from "../../utils/maxLoveManager";
 
-export const data = {
+export const data = new SlashCommandBuilder()
+  .setName("maxlove")
+  .setDescription("Un peu d'amour pour Maxime ! (⏱ 1h)");
+
+/* {
   name: "maxlove",
   description: "Un peu d'amour pour Maxime ! (⏱ 1h)",
-};
+}; */
 export const aliases = ["maxlove"];
 
 export async function execute({
