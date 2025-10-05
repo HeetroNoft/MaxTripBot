@@ -31,7 +31,7 @@ export async function execute({ interaction, message }: any) {
     year: "numeric",
   }).format(departDate.toJSDate());
 
-  const replyText = `🛫 Maxime est parti pour l’Australie le **${formatted}**.`;
+  const replyText = `🛫 <@328795495936032768> est parti pour l’Australie le **${formatted}**.`;
 
   if (interaction) {
     await interaction.reply({ content: replyText });
