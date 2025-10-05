@@ -47,7 +47,7 @@ client.prefix = process.env.PREFIX || "!";
   });
 
   // 🕗 Planifier le message quotidien à 8h heure de Sydney
-  client.once("ready", () => {
+  client.once("clientReady", () => {
     cron.schedule(
       "0 8 * * *",
       () => {
