@@ -9,7 +9,7 @@
     "build": "tsc",
     "deploy": "ts-node src/deploy-commands.ts",
     "update": "git pull origin main && npm install",
-    "restart": "pm2 restart maxtripbot"
+    "restart": "pm2 restart MaxTripBot"
   },
   "keywords": [],
   "author": "Heet",
