@@ -17,14 +17,25 @@ export async function loadSlashCommands(client: ExtendedClient) {
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const commandModule = await import(filePath);
-    const command = commandModule.data ?? commandModule.default?.data;
-    if (!command || !command.name) continue;
 
-    client.commands.set(command.name, command);
-    if (typeof command.toJSON === "function") {
-      commands.push(command.toJSON());
+    // Récupère data et execute correctement
+    const commandData = commandModule.data ?? commandModule.default?.data;
+    const commandExecute =
+      commandModule.execute ?? commandModule.default?.execute;
+
+    if (!commandData || !commandData.name) continue;
+
+    // Stocke dans la collection : { data, execute }
+    client.commands.set(commandData.name, {
+      data: commandData,
+      execute: commandExecute,
+    });
+
+    // Pour le déploiement, on a besoin uniquement de data
+    if (typeof commandData.toJSON === "function") {
+      commands.push(commandData.toJSON());
     } else {
-      commands.push(command);
+      commands.push(commandData);
     }
   }
 
