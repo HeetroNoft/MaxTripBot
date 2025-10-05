@@ -61,15 +61,15 @@ export async function dailyMaximeMessage(client: Client) {
   if (diffDays < 0) {
     // Avant le départ → afficher le nombre de jours restants
     const daysRemaining = Math.abs(diffDays);
-    messageText = `📅 **Message du jour — MaxTripBot**\n\n<@328795495936032768> n’est pas encore parti pour l’Australie 🇦🇺\nIl reste **${daysRemaining} jour${
+    messageText = `📅 **Message du jour — ${today}**\n\n<@328795495936032768> n’est pas encore parti pour l’Australie 🇦🇺\nIl reste **${daysRemaining} jour${
       daysRemaining > 1 ? "s" : ""
     }** avant le grand départ ! 🛫\n\nDépart prévu le **${formattedDepartDate}**.`;
   } else if (diffDays === 0) {
     // Jour du départ
-    messageText = `📅 **Message du jour — MaxTripBot**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 ! Bon vol et bonne aventure !`;
+    messageText = `📅 **Message du jour — ${today}**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 ! Bon vol et bonne aventure !`;
   } else {
     // Après le départ
-    messageText = `📅 **Message du jour — MaxTripBot**\n\nCela fait maintenant **${diffDays} jour${
+    messageText = `📅 **Message du jour — ${today}**\n\nCela fait maintenant **${diffDays} jour${
       diffDays > 1 ? "s" : ""
     }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\n${randomPhrase}\n\nDate de départ : ${formattedDepartDate}`;
   }
