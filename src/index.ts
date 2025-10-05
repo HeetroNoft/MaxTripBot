@@ -17,6 +17,7 @@ const client = new Client({
   ],
 }) as ExtendedClient;
 
+// ✅ Initialisation des collections et prefix
 client.commands = new Collection();
 client.prefix = process.env.PREFIX || "!";
 
@@ -24,7 +25,7 @@ client.prefix = process.env.PREFIX || "!";
   // ⚡ Charger toutes les commandes slash avant de démarrer
   await loadSlashCommands(client);
 
-  // Événements
+  // 🔹 Enregistrement des événements
   registerEvents(client);
   handleMessage(client);
 
@@ -33,16 +34,26 @@ client.prefix = process.env.PREFIX || "!";
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
-    if (!command) return;
+
+    // ❌ Sécurité : vérifier que execute existe
+    if (!command || typeof command.execute !== "function") {
+      console.warn(
+        `⚠️ Commande ${interaction.commandName} non trouvée ou execute manquant`
+      );
+      return;
+    }
 
     try {
       await command.execute({ interaction, client });
     } catch (error) {
       console.error(error);
-      await interaction.reply({
-        content: "Une erreur est survenue.",
-        ephemeral: true,
-      });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content:
+            "Une erreur est survenue lors de l'exécution de la commande.",
+          ephemeral: true,
+        });
+      }
     }
   });
 
