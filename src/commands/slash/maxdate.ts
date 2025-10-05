@@ -1,8 +1,5 @@
 import { DateTime } from "luxon";
-import dotenv from "dotenv";
 import { SlashCommandBuilder } from "discord.js";
-
-dotenv.config();
 
 export const data = new SlashCommandBuilder()
   .setName("maxdate")
