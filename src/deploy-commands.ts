@@ -16,16 +16,14 @@ dotenv.config();
     const commands = [];
 
     for (const file of commandFiles) {
-      // import dynamique
       const commandModule = await import(path.join(commandsPath, file));
+      const command = commandModule.data ?? commandModule.default?.data;
+      if (!command) continue;
 
-      if (commandModule.data) {
-        // Vérifie si c'est un SlashCommandBuilder et utilise toJSON
-        if (typeof commandModule.data.toJSON === "function") {
-          commands.push(commandModule.data.toJSON());
-        } else {
-          commands.push(commandModule.data);
-        }
+      if (typeof command.toJSON === "function") {
+        commands.push(command.toJSON());
+      } else {
+        commands.push(command);
       }
     }
 
@@ -34,14 +32,27 @@ dotenv.config();
       process.env.DISCORD_TOKEN!
     );
 
-    console.log("🚀 Déploiement des commandes slash globalement...");
+    // Liste des serveurs où déployer
+    const guildIds = process.env.GUILD_IDS?.split(",") || [];
+    if (guildIds.length === 0) {
+      console.log(
+        "⚠️ Aucune GUILD_ID fournie dans .env (GUILD_IDS séparées par des virgules)"
+      );
+      return;
+    }
 
-    // 🔹 Déploiement global (à remplacer par applicationGuildCommands pour serveur spécifique)
-    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID!), {
-      body: commands,
-    });
+    console.log("🚀 Déploiement des commandes slash sur les serveurs...");
 
-    console.log("✅ Commandes slash déployées globalement !");
+    // 🔹 Déploiement sur chaque serveur
+    for (const guildId of guildIds) {
+      await rest.put(
+        Routes.applicationGuildCommands(process.env.CLIENT_ID!, guildId.trim()),
+        { body: commands }
+      );
+      console.log(`✅ Commandes slash déployées sur le serveur ${guildId}`);
+    }
+
+    console.log("🎉 Déploiement terminé sur tous les serveurs !");
   } catch (error) {
     console.error("❌ Erreur lors du déploiement des commandes :", error);
   }
