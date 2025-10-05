@@ -1,11 +1,9 @@
 import { Client, GatewayIntentBits, Collection } from "discord.js";
 import dotenv from "dotenv";
-import cron from "node-cron";
 import { registerEvents } from "./events/ready";
 import { handleMessage } from "./events/messageCreate";
 import { ExtendedClient } from "./types/ExtendedClient";
 import { loadSlashCommands } from "./utils/logger";
-import { dailyMaximeMessage } from "./utils/dailyMessage";
 
 dotenv.config({ path: ".env" });
 
@@ -55,21 +53,6 @@ client.prefix = process.env.PREFIX || "!";
         });
       }
     }
-  });
-
-  // 🕗 Planifier le message quotidien à 8h heure de Sydney
-  client.once("clientReady", () => {
-    cron.schedule(
-      "0 8 * * *",
-      () => {
-        dailyMaximeMessage(client);
-      },
-      {
-        timezone: "Australia/Sydney",
-      }
-    );
-
-    console.log("⏰ Message quotidien planifié à 8h (heure de Sydney)");
   });
 
   // 🚀 Connexion du bot
