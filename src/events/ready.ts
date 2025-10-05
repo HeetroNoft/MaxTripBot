@@ -13,7 +13,7 @@ export function registerEvents(client: Client) {
 
     // 🎯 CRON principal : 9h à Sydney
     cron.schedule(
-      "16 9 * * *",
+      "18 9 * * *",
       () => {
         console.log("🕗 [CRON] Exécution du message quotidien !");
         dailyMaximeMessage(client);
