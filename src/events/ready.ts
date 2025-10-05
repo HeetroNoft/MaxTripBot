@@ -11,9 +11,9 @@ export function registerEvents(client: Client) {
       new Date().toLocaleString("fr-FR", { timeZone: "Australia/Sydney" })
     );
 
-    // 🎯 CRON principal : 8h à Sydney
+    // 🎯 CRON principal : 9h à Sydney
     cron.schedule(
-      "0 8 * * *",
+      "0 9 * * *",
       () => {
         console.log("🕗 [CRON] Exécution du message quotidien !");
         dailyMaximeMessage(client);
