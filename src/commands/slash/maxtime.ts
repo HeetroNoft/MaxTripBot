@@ -15,7 +15,7 @@ export async function execute({
   message?: any;
 }) {
   const franceTime = DateTime.now().setZone("Europe/Paris");
-  const australiaTime = DateTime.now().setZone("Australia/Sydney");
+  const australiaTime = DateTime.now().setZone("Australia/Perth");
 
   // Calcul de la différence de temps en heures
   let diffHours = australiaTime.offset - franceTime.offset; // offset en minutes
@@ -26,7 +26,7 @@ export async function execute({
     .setTitle("⏰ Heures actuelles")
     .setDescription(
       `🇫🇷 France (Paris) : ${franceTime.toFormat("HH:mm")}\n` +
-        `🇦🇺 Australie (Sydney) : ${australiaTime.toFormat("HH:mm")}\n` +
+        `🇦🇺 Australie (Perth) : ${australiaTime.toFormat("HH:mm")}\n` +
         `\nDifférence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
     )
     .setFooter({ text: "MaxTripBot • Time Info" });

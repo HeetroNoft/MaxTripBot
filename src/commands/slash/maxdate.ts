@@ -19,7 +19,7 @@ export async function execute({ interaction, message }: any) {
     return;
   }
 
-  const departDate = DateTime.fromISO(departISO).setZone("Australia/Sydney");
+  const departDate = DateTime.fromISO(departISO).setZone("Australia/Perth");
 
   // Utiliser Intl.DateTimeFormat pour formater en français
   const formatted = new Intl.DateTimeFormat("fr-FR", {

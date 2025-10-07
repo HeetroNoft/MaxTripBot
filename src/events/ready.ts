@@ -7,11 +7,11 @@ export function registerEvents(client: Client) {
     console.log(`✅ Connecté en tant que ${client.user?.tag}`);
 
     console.log(
-      "🕒 Heure actuelle à Sydney :",
-      new Date().toLocaleString("fr-FR", { timeZone: "Australia/Sydney" })
+      "🕒 Heure actuelle à Perth :",
+      new Date().toLocaleString("fr-FR", { timeZone: "Australia/Perth" })
     );
 
-    // 🎯 CRON principal : 9h à Sydney
+    // 🎯 CRON principal : 9h à Perth
     cron.schedule(
       "1 9 * * *",
       () => {
@@ -19,10 +19,10 @@ export function registerEvents(client: Client) {
         dailyMaximeMessage(client);
       },
       {
-        timezone: "Australia/Sydney",
+        timezone: "Australia/Perth",
       }
     );
 
-    console.log("⏰ Message quotidien planifié à 9h (heure de Sydney)");
+    console.log("⏰ Message quotidien planifié à 9h (heure de Perth)");
   });
 }
