@@ -11,9 +11,9 @@ export function registerEvents(client: Client) {
       new Date().toLocaleString("fr-FR", { timeZone: "Australia/Perth" })
     );
 
-    // 🎯 CRON principal : 9h à Perth
+    // 🎯 CRON principal : 6h à Perth
     cron.schedule(
-      "1 9 * * *",
+      "1 6 * * *",
       () => {
         console.log("🕗 [CRON] Exécution du message quotidien !");
         dailyMaximeMessage(client);
@@ -23,6 +23,6 @@ export function registerEvents(client: Client) {
       }
     );
 
-    console.log("⏰ Message quotidien planifié à 9h (heure de Perth)");
+    console.log("⏰ Message quotidien planifié à 6h (heure de Perth)");
   });
 }
