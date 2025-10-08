@@ -1,10 +1,10 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 
 export const data = new SlashCommandBuilder()
-  .setName("maxlove")
-  .setDescription("Un peu d'amour pour Maxime ! (⏱ 1h)");
+  .setName("maxpolar")
+  .setDescription("Affiche le lien vers le Polarsteps de Maxime");
 
-export const aliases = ["maxlove"];
+export const aliases = ["maxpolar"];
 
 export async function execute({
   interaction,
