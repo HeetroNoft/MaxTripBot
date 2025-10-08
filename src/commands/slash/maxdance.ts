@@ -15,7 +15,7 @@ export async function execute({
   message?: any;
 }) {
   // Résolution du chemin absolu
-  const gifPath = path.join(__dirname, "../../assets/gif/maxdance.gif");
+  const gifPath = path.join(__dirname, "../../../assets/gif/maxdance.gif");
 
   try {
     if (interaction) {
