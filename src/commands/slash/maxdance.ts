@@ -15,7 +15,7 @@ export async function execute({
   message?: any;
   client: any;
 }) {
-  const gifURL = "../../assets/gif/maxdance.gif"; // ton GIF
+  const gifURL = "src/assets/gif/maxdance.gif"; // ton GIF
 
   if (interaction) {
     await interaction.reply({ files: [gifURL] });
