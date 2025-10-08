@@ -14,12 +14,11 @@ export async function execute({
   interaction?: any;
   message?: any;
 }) {
-  // Résolution du chemin absolu
-  const gifPath = path.join(__dirname, "../../../assets/gif/maxdance.gif");
+  // Chemin absolu depuis la racine du projet
+  const gifPath = path.join(process.cwd(), "src/assets/gif/maxdance.gif");
 
   try {
     if (interaction) {
-      // S'assurer que l'on répond une seule fois
       if (!interaction.replied) {
         await interaction.reply({ files: [gifPath] });
       } else {
