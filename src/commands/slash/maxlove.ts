@@ -25,6 +25,14 @@ export async function execute({
   const userId = interaction?.user?.id || message?.author?.id;
   if (!userId) return;
 
+  const MaxUserId = "328795495936032768";
+
+  if (interaction.user.id == MaxUserId) {
+    return interaction.reply({
+      content: "Ah ouai tu t'aimes toi même hein ?! 😤",
+    });
+  }
+
   // 🔹 Vérifier si on est le jour du départ ou après
   const departISO = process.env.MAX_DEPART;
   if (!departISO) {
