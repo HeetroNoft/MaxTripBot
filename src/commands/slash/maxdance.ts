@@ -14,17 +14,19 @@ export async function execute({
   interaction?: any;
   message?: any;
 }) {
-  // Chemin absolu depuis la racine du projet
   const gifPath = path.join(process.cwd(), "src/assets/gif/maxdance.gif");
 
   try {
     if (interaction) {
-      if (!interaction.replied) {
-        await interaction.reply({ files: [gifPath] });
-      } else {
-        await interaction.followUp({ files: [gifPath] });
+      // Avertir Discord qu'on répond plus tard
+      if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferReply();
       }
+
+      // Ensuite, envoyer le GIF
+      await interaction.followUp({ files: [gifPath] });
     } else if (message) {
+      // Message classique
       await message.reply({ files: [gifPath] });
     }
   } catch (error) {
