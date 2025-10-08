@@ -1,25 +1,34 @@
 import { SlashCommandBuilder } from "discord.js";
+import path from "path";
 
 export const data = new SlashCommandBuilder()
   .setName("maxdance")
-  .setDescription("Petite dance de maxime");
+  .setDescription("Petite dance de Maxime");
 
 export const aliases = ["maxdance"];
 
 export async function execute({
   interaction,
   message,
-  client,
 }: {
   interaction?: any;
   message?: any;
-  client: any;
 }) {
-  const gifURL = "src/assets/gif/maxdance.gif"; // ton GIF
+  // Résolution du chemin absolu
+  const gifPath = path.join(__dirname, "../../assets/gif/maxdance.gif");
 
-  if (interaction) {
-    await interaction.reply({ files: [gifURL] });
-  } else if (message) {
-    await message.reply({ files: [gifURL] });
+  try {
+    if (interaction) {
+      // S'assurer que l'on répond une seule fois
+      if (!interaction.replied) {
+        await interaction.reply({ files: [gifPath] });
+      } else {
+        await interaction.followUp({ files: [gifPath] });
+      }
+    } else if (message) {
+      await message.reply({ files: [gifPath] });
+    }
+  } catch (error) {
+    console.error("Erreur lors de l'envoi du GIF :", error);
   }
 }
