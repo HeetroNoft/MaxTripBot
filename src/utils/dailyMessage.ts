@@ -47,6 +47,10 @@ export async function dailyMaximeMessage(client: Client) {
   const today = DateTime.now().setZone("Europe/Paris").startOf("day");
   const diffDays = Math.floor(today.diff(departDate, "days").days);
 
+  console.log("🕓 Aujourd’hui :", today.toISO());
+  console.log("🛫 Date de départ :", departDate.toISO());
+  console.log("📆 Différence (jours) :", today.diff(departDate, "days").days);
+
   // 🔹 Formater la date en français
   const formattedTodayDate = new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
