@@ -41,8 +41,10 @@ export async function dailyMaximeMessage(client: Client) {
       : "Maxime continue son aventure australienne 🌏";
 
   // 📅 Calcul du nombre de jours
-  const departDate = DateTime.fromISO(departISO).startOf("day");
-  const today = DateTime.now().setZone("Australia/Perth").startOf("day");
+  const departDate = DateTime.fromISO(departISO, {
+    zone: "Europe/Paris",
+  }).startOf("day");
+  const today = DateTime.now().setZone("Europe/Paris").startOf("day");
   const diffDays = Math.floor(today.diff(departDate, "days").days);
 
   // 🔹 Formater la date en français
