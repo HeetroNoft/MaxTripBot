@@ -3,10 +3,7 @@ import { DateTime } from "luxon";
 import fs from "fs";
 import path from "path";
 import { getMaxLoveCount } from "./maxLoveManager";
-/**
- * Envoie un message quotidien indiquant le nombre de jours depuis (ou avant) le départ de Maxime.
- * Une phrase aléatoire est sélectionnée à partir du fichier JSON.
- */
+
 export async function dailyMaximeMessage(client: Client) {
   const total = getMaxLoveCount();
   const channelId = process.env.DAILY_CHANNEL_ID;
