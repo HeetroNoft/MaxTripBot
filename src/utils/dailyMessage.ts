@@ -37,47 +37,51 @@ export async function dailyMaximeMessage(client: Client) {
       ? phrases[Math.floor(Math.random() * phrases.length)]
       : "Maxime continue son aventure australienne 🌏";
 
-  // 📅 Calcul du nombre de jours
+  // 🕓 Gestion précise des fuseaux horaires
+  const nowParis = DateTime.now().setZone("Europe/Paris");
+  const today = nowParis.startOf("day");
   const departDate = DateTime.fromISO(departISO, {
     zone: "Europe/Paris",
   }).startOf("day");
-  const today = DateTime.now().setZone("Europe/Paris").startOf("day");
   const diffDays = Math.floor(today.diff(departDate, "days").days);
 
-  console.log("🕓 Aujourd’hui :", today.toISO());
+  // 🧩 Logs utiles pour vérifier la date
+  console.log("🕓 now UTC :", DateTime.utc().toISO());
+  console.log("🕓 now Paris :", nowParis.toISO());
+  console.log("🕓 startOf('day') Paris :", today.toISO());
   console.log("🛫 Date de départ :", departDate.toISO());
-  console.log("📆 Différence (jours) :", today.diff(departDate, "days").days);
+  console.log("📆 Différence (jours) :", diffDays);
 
-  // 🔹 Formater la date en français
+  // 🔹 Formater les dates en français
   const formattedTodayDate = new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
-  }).format(today.toJSDate());
+  }).format(nowParis.toJSDate());
+
   const formattedDepartDate = new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   }).format(departDate.toJSDate());
 
+  // 💬 Générer le message
   let messageText: string;
 
   if (diffDays < 0) {
-    // Avant le départ → afficher le nombre de jours restants
     const daysRemaining = Math.abs(diffDays);
     messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\n<@328795495936032768> n’est pas encore parti pour l’Australie 🇦🇺\nIl reste **${daysRemaining} jour${
       daysRemaining > 1 ? "s" : ""
     }** avant le grand départ ! 🛫\n\nDépart prévu le **${formattedDepartDate}**.`;
   } else if (diffDays === 0) {
-    // Jour du départ
     messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 !\nBon vol et bonne aventure !\n\n💖 Le /maxlove est maintenant disponible !`;
   } else {
-    // Après le départ
     messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\nCela fait maintenant **${diffDays} jour${
       diffDays > 1 ? "s" : ""
     }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\n${randomPhrase}\n\nDate de départ : ${formattedDepartDate}`;
   }
 
+  // 🚀 Envoi du message
   await channel.send(messageText);
   console.log(`✅ Message quotidien envoyé dans #${channel.name}`);
 }
