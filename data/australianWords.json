@@ -1,0 +1,137 @@
+[
+  { "word": "Arvo", "meaning": "Après-midi", "emoji": "🌞" },
+  { "word": "Barbie", "meaning": "Barbecue", "emoji": "🍖" },
+  { "word": "Bogan", "meaning": "Personne peu sophistiquée", "emoji": "🤠" },
+  { "word": "Brekkie", "meaning": "Petit-déjeuner", "emoji": "🥞" },
+  { "word": "Cuppa", "meaning": "Une tasse de thé ou café", "emoji": "☕" },
+  { "word": "Dunny", "meaning": "Toilettes", "emoji": "🚽" },
+  { "word": "Esky", "meaning": "Glacière", "emoji": "🧊" },
+  {
+    "word": "Fair dinkum",
+    "meaning": "Vraiment sincère ou vrai",
+    "emoji": "✅"
+  },
+  { "word": "G’day", "meaning": "Bonjour", "emoji": "👋" },
+  { "word": "Heaps", "meaning": "Beaucoup", "emoji": "📈" },
+  {
+    "word": "Larrikin",
+    "meaning": "Personne espiègle mais sympathique",
+    "emoji": "😏"
+  },
+  { "word": "Macca’s", "meaning": "McDonald’s", "emoji": "🍔" },
+  { "word": "Mozzie", "meaning": "Moustique", "emoji": "🦟" },
+  { "word": "No worries", "meaning": "Pas de problème", "emoji": "✌️" },
+  { "word": "Ripper", "meaning": "Super, génial", "emoji": "🎉" },
+  { "word": "Servo", "meaning": "Station-service", "emoji": "⛽" },
+  { "word": "Sheila", "meaning": "Femme", "emoji": "👩" },
+  { "word": "Snag", "meaning": "Saucisse", "emoji": "🌭" },
+  { "word": "Stubby", "meaning": "Bouteille de bière", "emoji": "🍺" },
+  { "word": "Thongs", "meaning": "Tongs", "emoji": "🩴" },
+  { "word": "Tradie", "meaning": "Ouvrier du bâtiment", "emoji": "👷" },
+  { "word": "Ute", "meaning": "Pick-up", "emoji": "🚚" },
+  {
+    "word": "Vegemite",
+    "meaning": "Pâte à tartiner australienne",
+    "emoji": "🍞"
+  },
+  { "word": "Yakka", "meaning": "Travail dur", "emoji": "💪" },
+  { "word": "Bush", "meaning": "Campagne, forêt", "emoji": "🌳" },
+  { "word": "Bloke", "meaning": "Homme", "emoji": "🧔" },
+  { "word": "Cark it", "meaning": "Mourir ou tomber en panne", "emoji": "💀" },
+  { "word": "Daks", "meaning": "Pantalons", "emoji": "👖" },
+  { "word": "Earbashing", "meaning": "Parler trop", "emoji": "🗣️" },
+  { "word": "Footy", "meaning": "Football australien", "emoji": "🏉" },
+  { "word": "Grouse", "meaning": "Super, génial", "emoji": "🔥" },
+  { "word": "Hoon", "meaning": "Conducteur imprudent", "emoji": "🚗💨" },
+  { "word": "Chook", "meaning": "Poulet", "emoji": "🐔" },
+  { "word": "Fair go", "meaning": "Chance équitable", "emoji": "⚖️" },
+  { "word": "Bail", "meaning": "Partir", "emoji": "🏃‍♂️" },
+  { "word": "Carked it", "meaning": "Mort ou cassé", "emoji": "☠️" },
+  { "word": "Dingo", "meaning": "Chien sauvage d’Australie", "emoji": "🐕‍🦺" },
+  { "word": "Flat out", "meaning": "Très occupé", "emoji": "🏃‍♀️" },
+  { "word": "Footpath", "meaning": "Trottoir", "emoji": "🛣️" },
+  { "word": "Hooroo", "meaning": "Au revoir", "emoji": "👋" },
+  {
+    "word": "Jackaroo",
+    "meaning": "Jeune fermier travaillant dans le bush",
+    "emoji": "🤠"
+  },
+  { "word": "Kangaroo court", "meaning": "Tribunal injuste", "emoji": "⚖️" },
+  { "word": "Lollies", "meaning": "Bonbons", "emoji": "🍬" },
+  { "word": "Mateship", "meaning": "Amitié, camaraderie", "emoji": "🤝" },
+  { "word": "Ocker", "meaning": "Australien typique rustique", "emoji": "🦘" },
+  {
+    "word": "Piker",
+    "meaning": "Personne lâche ou qui abandonne",
+    "emoji": "😬"
+  },
+  { "word": "Roo", "meaning": "Kangourou", "emoji": "🦘" },
+  { "word": "Strewth", "meaning": "Expression de surprise", "emoji": "😲" },
+  { "word": "Stubby holder", "meaning": "Porte-bouteille", "emoji": "🍺" },
+  { "word": "Swag", "meaning": "Sac de couchage pour camping", "emoji": "🎒" },
+  { "word": "Ta", "meaning": "Merci", "emoji": "🙏" },
+  {
+    "word": "Trackie dacks",
+    "meaning": "Pantalons de survêtement",
+    "emoji": "👖"
+  },
+  { "word": "Veg out", "meaning": "Se détendre", "emoji": "🛋️" },
+  { "word": "Woop woop", "meaning": "Endroit isolé", "emoji": "🏜️" },
+  {
+    "word": "Yobbo",
+    "meaning": "Personne bruyante et grossière",
+    "emoji": "😤"
+  },
+  { "word": "Bikkie", "meaning": "Biscuit", "emoji": "🍪" },
+  { "word": "Bog standard", "meaning": "Ordinaire", "emoji": "📦" },
+  { "word": "Bonzer", "meaning": "Excellent", "emoji": "🌟" },
+  { "word": "Bottlebrush", "meaning": "Plante australe", "emoji": "🌺" },
+  { "word": "Brissy", "meaning": "Brisbane", "emoji": "🏙️" },
+  {
+    "word": "Buck's night",
+    "meaning": "Enterrement de vie de garçon",
+    "emoji": "🎉"
+  },
+  { "word": "Bunyip", "meaning": "Créature mythique", "emoji": "👹" },
+  {
+    "word": "Bushranger",
+    "meaning": "Hors-la-loi dans le bush",
+    "emoji": "🏞️"
+  },
+  { "word": "Chunder", "meaning": "Vomir", "emoji": "🤢" },
+  { "word": "Clucky", "meaning": "Qui veut des enfants", "emoji": "🐣" },
+  { "word": "Cobber", "meaning": "Ami, pote", "emoji": "🤝" },
+  {
+    "word": "Cooee",
+    "meaning": "Appel pour se faire remarquer",
+    "emoji": "📣"
+  },
+  { "word": "Deadset", "meaning": "Sérieux, vrai", "emoji": "✅" },
+  { "word": "Ace", "meaning": "Super, génial", "emoji": "😎" },
+  { "word": "Ankle biter", "meaning": "Petit enfant", "emoji": "👶" },
+  { "word": "Bathers", "meaning": "Maillot de bain", "emoji": "👙" },
+  { "word": "Cooee", "meaning": "Appel dans le bush", "emoji": "📣" },
+  { "word": "Dole", "meaning": "Allocation chômage", "emoji": "💸" },
+  { "word": "Esky lid", "meaning": "Couvercle de glacière", "emoji": "🧊" },
+  {
+    "word": "Fair crack of the whip",
+    "meaning": "Avoir une chance équitable",
+    "emoji": "⚖️"
+  },
+  {
+    "word": "Footy jumper",
+    "meaning": "Maillot de football australien",
+    "emoji": "🏉"
+  },
+  { "word": "Galah", "meaning": "Personne bête ou ridicule", "emoji": "🦜" },
+  { "word": "Rooted", "meaning": "Fatigué ou cassé", "emoji": "😵" },
+  { "word": "Sheila’s mob", "meaning": "Groupe de femmes", "emoji": "👩‍👩‍👧" },
+  { "word": "Squiz", "meaning": "Regarder vite fait", "emoji": "👀" },
+  {
+    "word": "Tinny",
+    "meaning": "Petit bateau ou canette de bière",
+    "emoji": "🛶🍺"
+  },
+  { "word": "Trackies", "meaning": "Pantalon de survêtement", "emoji": "👖" },
+  { "word": "Yakka up", "meaning": "Travailler dur", "emoji": "💪" }
+]

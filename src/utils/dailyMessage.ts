@@ -67,11 +67,11 @@ export async function dailyMaximeMessage(client: Client) {
       daysRemaining > 1 ? "s" : ""
     }** avant le grand départ ! 🛫\n\nDépart prévu le **${formattedDepartDate}**.`;
   } else if (diffDays === 0) {
-    messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 !\nBon vol et bonne aventure !\n\n💖 Le /maxlove est maintenant disponible !`;
+    messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\n🛫 Aujourd’hui, <@328795495936032768> part pour l’Australie 🇦🇺 !\nBon vol et bonne aventure !\n\n💖 Le /maxlove et le /maxword sont maintenant disponibles !`;
   } else {
     messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\nCela fait maintenant **${diffDays} jour${
       diffDays > 1 ? "s" : ""
-    }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\n${randomPhrase}\n\nDate de départ : ${formattedDepartDate}`;
+    }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\nN'oubliez pas le **/maxword** du jour !\n\n*${randomPhrase}*\n\nDate de départ : ${formattedDepartDate}`;
   }
 
   // 🚀 Envoi du message
