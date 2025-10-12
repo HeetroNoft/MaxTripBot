@@ -22,8 +22,8 @@ export async function execute({ interaction, message }: any) {
 
   try {
     // Coordonnées de Maxime (exemple : Perth, Australie)
-    const lat = -31.95;
-    const lon = 115.86;
+    const lat = -31.57;
+    const lon = 115.52;
 
     const params = new URLSearchParams({
       latitude: lat.toString(),
@@ -60,7 +60,7 @@ export async function execute({ interaction, message }: any) {
 
     // 🔹 Créer l'embed
     const embed = new EmbedBuilder()
-      .setTitle(`🌤️ Météo à Perth (Maxime)`)
+      .setTitle(`🌤️ Météo à Perth`)
       .setColor("#1E90FF")
       .addFields(
         { name: "Température", value: `${tempEmoji} ${temp}°C`, inline: true },
