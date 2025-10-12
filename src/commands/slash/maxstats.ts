@@ -22,19 +22,34 @@ export async function execute({
   const total = getMaxLoveCount();
   const leaderboard = getMaxLoveLeaderboard();
 
-  const description = leaderboard
-    .map(([userId, count], i) => `${i + 1}. <@${userId}> : **${count}**`)
-    .join("\n");
+  // Trier les utilisateurs par score décroissant
+  const sorted = [...leaderboard].sort((a, b) => b[1] - a[1]);
+
+  // Différents cœurs pour les 3 premiers
+  const hearts = ["💗", "💖", "💘", "💞", "💕"];
+
+  // Créer un top 5 formaté
+  const top =
+    sorted.length > 0
+      ? sorted
+          .slice(0, 5)
+          .map(
+            ([user, score], i) =>
+              `**${i + 1}.** <@${user}> — ${score} ${hearts[i] ?? "❤️"}`
+          )
+          .join("\n")
+      : "Aucun MaxLove pour le moment 😢";
 
   const embed = new EmbedBuilder()
-    .setColor(0x00ffff)
-    .setTitle("📊 MaxStats")
+    .setColor(0xff66cc)
+    .setTitle("📊 MaxStats — Classement des MaxLove 💘")
     .setDescription(
-      `**Total MaxLove : ${total}**\n\n**Top utilisateurs :**\n${
-        description || "Aucun MaxLove pour le moment !"
-      }`
+      `**Total de MaxLove envoyés : ${total} ❤️**\n\n🏆 **Top 5 utilisateurs :**\n${top}`
     )
-    .setFooter({ text: "MaxTripBot • Stats MaxLove" });
+    .setThumbnail("https://cdn-icons-png.flaticon.com/512/833/833472.png")
+    .setFooter({
+      text: "MaxTripBot • Stats MaxLove",
+    });
 
   if (interaction) await interaction.reply({ embeds: [embed] });
   else if (message) await message.reply({ embeds: [embed] });
