@@ -46,7 +46,6 @@ export async function execute({
     .setDescription(
       `**Total de MaxLove envoyés : ${total} ❤️**\n\n🏆 **Top 5 utilisateurs :**\n${top}`
     )
-    .setThumbnail("https://cdn-icons-png.flaticon.com/512/833/833472.png")
     .setFooter({
       text: "MaxTripBot • Stats MaxLove",
     });
