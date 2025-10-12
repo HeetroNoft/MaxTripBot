@@ -52,18 +52,11 @@ export async function dailyMaximeMessage(client: Client) {
   console.log("🛫 Date de départ :", departDate.toISO());
   console.log("📆 Différence (jours) :", diffDays);
 
-  // 🔹 Formater les dates en français
-  const formattedTodayDate = new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(nowParis.toJSDate());
-
-  const formattedDepartDate = new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(departDate.toJSDate());
+  // 🔹 Formater les dates à partir de today / departDate (pas nowParis)
+  const formattedTodayDate = today.setLocale("fr").toFormat("dd LLLL yyyy");
+  const formattedDepartDate = departDate
+    .setLocale("fr")
+    .toFormat("dd LLLL yyyy");
 
   // 💬 Générer le message
   let messageText: string;
