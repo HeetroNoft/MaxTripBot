@@ -22,11 +22,13 @@
     "instagram-url-direct": "^2.0.7",
     "luxon": "^3.7.2",
     "moment-timezone": "^0.6.0",
-    "node-cron": "^4.2.1"
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/luxon": "^3.7.1",
     "@types/node": "^24.6.2",
+    "@types/node-fetch": "^2.6.13",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
