@@ -1,7 +1,7 @@
 import path from "path";
 import puppeteer from "puppeteer";
 import fs from "fs-extra";
-import { DateTime } from "luxon";
+import { DateTime, Zone } from "luxon";
 
 const TRIP_URL =
   "https://www.polarsteps.com/MaximeCrosne/22019906-australie?s=8b079af3-2be6-476e-9ba8-a83448df30c9&referral=true";
@@ -96,69 +96,19 @@ export async function getDataPayload<T = unknown>(
 
     // Gestion spéciale pour nb_country
     if (dataPath === "nb_country") {
-      const zSteps = payload.zelda_steps || [];
-      const countries = new Set<string>();
-      for (const step of zSteps) {
-        const country = step?.location?.country;
-        if (country && country !== "") countries.add(country);
-      }
-      return countries.size as any;
+      return nbCountry(payload) as any;
     }
+
     if (dataPath === "flag_countries") {
-      const zSteps = payload.zelda_steps || [];
-      const countries = new Set<string>();
-
-      for (const step of zSteps) {
-        const countryCode = step?.location?.country_code;
-        // Vérification : au moins une lettre et aucun chiffre
-        if (
-          countryCode &&
-          /^[A-Za-z]+$/.test(countryCode) &&
-          countryCode.length >= 1
-        ) {
-          countries.add(countryCode.toUpperCase());
-        }
-      }
-
-      const flags = [...countries]
-        .map((countryCode) => {
-          const codePoints = [...countryCode].map(
-            (char) => 0x1f1e6 + char.charCodeAt(0) - 65
-          );
-          return String.fromCodePoint(...codePoints);
-        })
-        .join(" ");
-
-      return flags as any;
+      return flagCountries(payload) as any;
     }
 
     if (dataPath === "nb_steps") {
       return payload.steps.length as any;
     }
+
     if (dataPath === "timeSinceUpdate") {
-      const lastModified = payload.last_modified || null;
-
-      const last = DateTime.fromISO(lastModified, {
-        zone: payload.timezone_id,
-      });
-      const now = DateTime.now().setZone(payload.timezone_id);
-
-      const diff = now.diff(last, ["days", "hours", "minutes"]).toObject();
-      console.log("all", diff);
-
-      if (diff.days && diff.days >= 1) {
-        console.log("days", diff);
-        return `${Math.floor(diff.days)}j` as any;
-      } else if (diff.hours && diff.hours >= 1) {
-        console.log("hours", diff);
-        return `${Math.floor(diff.hours)}h` as any;
-      } else if (diff.minutes && diff.minutes >= 1) {
-        console.log("minutes", diff);
-        return `${Math.floor(diff.minutes)}min` as any;
-      } else {
-        console.log("seconds", diff);
-        return "quelques secondes" as any;
-      }
+      return lastSinceUpdate(payload) as any;
     }
 
     if (!dataPath) {
@@ -185,5 +135,72 @@ export async function getDataPayload<T = unknown>(
   } catch (err) {
     console.error("Erreur dans getDataPayload:", err);
     return undefined;
+  }
+}
+
+function nbCountry(payload: { zelda_steps: any[] }): number {
+  const zSteps = payload.zelda_steps || [];
+  const countries = new Set<string>();
+  for (const step of zSteps) {
+    const country = step?.location?.country;
+    if (country && country !== "") countries.add(country);
+  }
+  return countries.size as any;
+}
+
+function flagCountries(payload: { zelda_steps: any[] }): string {
+  const zSteps = payload.zelda_steps || [];
+  const countries = new Set<string>();
+
+  for (const step of zSteps) {
+    const countryCode = step?.location?.country_code;
+    // Vérification : au moins une lettre et aucun chiffre
+    if (
+      countryCode &&
+      /^[A-Za-z]+$/.test(countryCode) &&
+      countryCode.length >= 1
+    ) {
+      countries.add(countryCode.toUpperCase());
+    }
+  }
+
+  const flags = [...countries]
+    .map((countryCode) => {
+      const codePoints = [...countryCode].map(
+        (char) => 0x1f1e6 + char.charCodeAt(0) - 65
+      );
+      return String.fromCodePoint(...codePoints);
+    })
+    .join(" ");
+
+  return flags as any;
+}
+
+function lastSinceUpdate(payload: {
+  last_modified: null;
+  timezone_id: string | Zone<boolean> | undefined;
+}): string {
+  const lastModified = payload.last_modified || (null as any);
+
+  const last = DateTime.fromISO(lastModified, {
+    zone: payload.timezone_id,
+  });
+  const now = DateTime.now().setZone(payload.timezone_id);
+
+  const diff = now.diff(last, ["days", "hours", "minutes"]).toObject();
+  console.log("all", diff);
+
+  if (diff.days && diff.days >= 1) {
+    console.log("days", diff);
+    return `${Math.floor(diff.days)}j` as any;
+  } else if (diff.hours && diff.hours >= 1) {
+    console.log("hours", diff);
+    return `${Math.floor(diff.hours)}h` as any;
+  } else if (diff.minutes && diff.minutes >= 1) {
+    console.log("minutes", diff);
+    return `${Math.floor(diff.minutes)}min` as any;
+  } else {
+    console.log("seconds", diff);
+    return "quelques secondes" as any;
   }
 }
