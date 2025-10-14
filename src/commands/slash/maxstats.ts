@@ -25,6 +25,11 @@ export async function execute({
     const totalDistanceRaw = await getDataPayload<number>("total_km");
     const totalDistance = totalDistanceRaw?.toFixed(1) || "Distance inconnue";
 
+    const totalCountries = await getDataPayload<number>("nb_country");
+
+    const totalSteps = await getDataPayload<number>("nb_steps");
+    const allFlags = await getDataPayload<string[]>("flag_countries");
+
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
 
@@ -50,7 +55,7 @@ export async function execute({
       .setColor(0xff66cc)
       .setTitle("📊 MaxStats")
       .setDescription(
-        `**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
+        `**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**🎯 Nombre d'étapes :** ${totalSteps}\n\n**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
       )
       .setFooter({
         text: "MaxTripBot • Stats",

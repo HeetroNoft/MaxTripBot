@@ -14,23 +14,32 @@ export async function execute({ interaction }: any) {
   await interaction.deferReply();
 
   // Récupère la dernière step
-  const latestStep = await getDataPayload<any>("", true);
 
-  const place = latestStep?.location?.full_detail || "Lieu inconnu";
+  const place =
+    (await getDataPayload<string>("location.full_detail", true)) ||
+    "Lieu inconnu";
   const dateISO =
-    latestStep?.start_time || latestStep?.creation_time || "Date inconnue";
+    (await getDataPayload<string>("start_time", true)) ||
+    (await getDataPayload<string>("creation_time", true)) ||
+    "Date inconnue";
   const dt = DateTime.fromISO(dateISO, { zone: "Europe/Paris" });
 
-  const title = latestStep?.display_name || "Dernière position de Maxime";
-  const temperature = latestStep?.weather_temperature ?? "Température inconnue";
+  const title =
+    (await getDataPayload<string>("display_name", true)) ||
+    "Dernière position de Maxime";
+  const temperature =
+    (await getDataPayload<string>("weather_temperature", true)) ||
+    "Température inconnue";
   const description =
-    latestStep?.description || "Pas de description disponible.";
+    (await getDataPayload<string>("description", true)) ||
+    "Pas de description disponible.";
 
   // Récupère le dernier media si disponible
-  const mediaArray = latestStep?.media || [];
+  const mediaArray = (await getDataPayload<any>("media", true)) || [];
   const lastMedia =
     mediaArray.length > 0 ? mediaArray[mediaArray.length - 1].path : null;
-  const image = lastMedia || latestStep?.screenshot_url || null;
+  const image =
+    lastMedia || (await getDataPayload<string>("screenshot_url", true)) || null;
 
   const embed = new EmbedBuilder()
     .setColor(0x00aaff)
