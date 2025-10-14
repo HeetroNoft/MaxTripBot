@@ -103,6 +103,8 @@ export async function execute({ interaction }: any) {
       latestStep.start_time || latestStep.creation_time || "Date inconnue";
     const dt = DateTime.fromISO(date, { zone: "Europe/Paris" });
 
+    const title = latestStep.display_name || "Dernière position de Maxime";
+    const temperature = latestStep.weather_temperature?.temperature;
     const description =
       latestStep.description || "Pas de description disponible.";
     const image =
@@ -110,11 +112,11 @@ export async function execute({ interaction }: any) {
 
     const embed = new EmbedBuilder()
       .setColor(0x00aaff)
-      .setTitle("📍 Dernière position de Maxime")
+      .setTitle(`📍 ${title}`)
       .setDescription(
-        `**${place}**\n🗓️ ${dt.toFormat(
-          "dd LLLL yyyy 'à' HH:mm:ss"
-        )}\n\n${description}`
+        `**${place}**\n🗓️ ${dt.toFormat("dd LLLL yyyy 'à' HH:mm:ss")}\n\n🌡️ ${
+          temperature ? `${temperature}°C` : "Température inconnue"
+        }\n\n${description}`
       )
       .setFooter({ text: "MaxTripBot • Données Polarsteps" });
 
