@@ -67,12 +67,15 @@ export function getCooldownRemaining(userId: string) {
 }
 
 // Nouvelle fonction : stats par jour
+
 export function getMaxLoveStatsPerDay() {
   const stats: Record<string, number> = {}; // { "2025-10-14": 5 }
 
   Object.values(data).forEach((user) => {
     user.history.forEach((timestamp) => {
-      const day = new Date(timestamp).toISOString().split("T")[0]; // YYYY-MM-DD
+      const day = DateTime.fromMillis(timestamp)
+        .setZone("Europe/Paris")
+        .toISODate(); // format "YYYY-MM-DD" en heure française
       stats[day] = (stats[day] || 0) + 1;
     });
   });
