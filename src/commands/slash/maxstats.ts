@@ -3,6 +3,8 @@ import {
   getMaxLoveCount,
   getMaxLoveLeaderboard,
 } from "../../utils/maxLoveManager";
+import fs from "fs-extra";
+import path from "path";
 
 export const data = new SlashCommandBuilder()
   .setName("maxstats")
@@ -19,7 +21,22 @@ export async function execute({
   message?: any;
   client: any;
 }) {
-  const total = getMaxLoveCount();
+  const PAYLOAD_FILE = path.resolve("./data/payload.json");
+  // Coordonnées de Maxime (exemple : Perth, Australie)
+  const latestStep = (await fs.readJson(PAYLOAD_FILE)).steps.sort(
+    (a: any, b: any) =>
+      new Date(b.start_time || b.creation_time).getTime() -
+      new Date(a.start_time || a.creation_time).getTime()
+  )[0];
+
+  if (!latestStep) {
+    return interaction.editReply(
+      "😕 Impossible de trouver la dernière step sur Polarsteps."
+    );
+  }
+
+  const totalDistance = latestStep.total_km.toFixed(1) || "Distance inconnue";
+  const totalMaxLove = getMaxLoveCount();
   const leaderboard = getMaxLoveLeaderboard();
 
   // Trier les utilisateurs par score décroissant
@@ -29,7 +46,7 @@ export async function execute({
   const hearts = ["💗", "💖", "💘", "💞", "💕"];
 
   // Créer un top 5 formaté
-  const top =
+  const topMaxLove =
     sorted.length > 0
       ? sorted
           .slice(0, 5)
@@ -42,12 +59,12 @@ export async function execute({
 
   const embed = new EmbedBuilder()
     .setColor(0xff66cc)
-    .setTitle("📊 MaxStats — Classement des MaxLove 💘")
+    .setTitle("📊 MaxStats")
     .setDescription(
-      `**Total de MaxLove envoyés : ${total} ❤️**\n\n🏆 **Top 5 utilisateurs :**\n${top}`
+      `**📏 Kilomètres parcourus : ${totalDistance}km**\n\n**💗 Total de MaxLove envoyés : ${totalMaxLove} ❤️**\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
     )
     .setFooter({
-      text: "MaxTripBot • Stats MaxLove",
+      text: "MaxTripBot • Stats",
     });
 
   if (interaction) await interaction.reply({ embeds: [embed] });
