@@ -132,10 +132,10 @@ export async function getDataPayload<T = unknown>(
       return flags as any;
     }
 
-    if (dataPath === "timeSinceUpdate") {
+    if (dataPath === "nb_steps") {
       return payload.steps.length as any;
     }
-    if (dataPath === "nb_steps") {
+    if (dataPath === "timeSinceUpdate") {
       const lastModified = (payload.last_modified || []).pop()?.start_time;
 
       const last = DateTime.fromISO(lastModified, {
