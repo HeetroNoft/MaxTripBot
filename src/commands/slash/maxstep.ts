@@ -31,7 +31,6 @@ export async function execute({ interaction }: any) {
     });
     const page = await browser.newPage();
 
-    // Stockage des réponses JSON du site
     const payloads: any[] = [];
 
     page.on("response", async (resp) => {
@@ -39,42 +38,58 @@ export async function execute({ interaction }: any) {
         const url = resp.url();
         const ct = resp.headers()["content-type"] || "";
         if (!ct.includes("application/json")) return;
+
         const text = await resp.text();
         if (text.includes('"steps"') || text.includes('"trip"')) {
           const json = JSON.parse(text);
           payloads.push({ url, json });
         }
-      } catch (_) {}
+      } catch {}
     });
 
-    // Connexion à Polarsteps
+    // Accès à la page de connexion
     await page.goto("https://www.polarsteps.com/login", {
       waitUntil: "networkidle2",
     });
-    await page.type('input[type="email"], input[name="email"]', EMAIL);
-    await page.type('input[type="password"], input[name="password"]', PASSWORD);
+
+    // Sélecteurs mis à jour pour le nouveau formulaire Polarsteps
+    await page.waitForSelector(
+      'input[type="email"], input[name="email"], input[name="username"]',
+      { timeout: 10000 }
+    );
+    await page.type(
+      'input[type="email"], input[name="email"], input[name="username"]',
+      EMAIL,
+      { delay: 50 }
+    );
+
+    await page.waitForSelector('input[type="password"]', { timeout: 10000 });
+    await page.type('input[type="password"]', PASSWORD, { delay: 50 });
+
     await Promise.all([
-      page.click('button[type="submit"], button:has-text("Log in")'),
+      page.click(
+        'button[type="submit"], button:has-text("Log in"), button:has-text("Sign in")'
+      ),
       page
         .waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 })
         .catch(() => {}),
     ]);
 
-    // Accéder au voyage
+    // Navigation vers le trip
     await page.goto(TRIP_URL, { waitUntil: "networkidle2", timeout: 60000 });
     await new Promise((resolve) => setTimeout(resolve, 4000));
 
-    // Sauvegarde des payloads pour debug
+    // Sauvegarde des données pour debug
     await fs.ensureDir("./polarsteps-output");
-    const outputFile = `./polarsteps-output/payloads-${Date.now()}.json`;
-    await fs.writeJson(outputFile, payloads, { spaces: 2 });
+    await fs.writeJson(
+      `./polarsteps-output/payloads-${Date.now()}.json`,
+      payloads,
+      { spaces: 2 }
+    );
 
-    // Extraction de la dernière étape
     const latestStep = payloads
-      .flatMap((p) => {
-        const steps = p.json?.trip?.steps || p.json?.data?.trip?.steps || [];
-        return Array.isArray(steps) ? steps : [];
-      })
+      .flatMap((p) => p.json?.trip?.steps || p.json?.data?.trip?.steps || [])
+      .filter(Boolean)
       .sort(
         (a, b) =>
           new Date(b.startDate || b.date).getTime() -
@@ -94,10 +109,9 @@ export async function execute({ interaction }: any) {
     const description = latestStep.text || "Pas de description disponible.";
     const image = latestStep.coverPhoto?.url || null;
 
-    // Embed Discord
     const embed = new EmbedBuilder()
       .setColor(0x00aaff)
-      .setTitle(`📍 Dernière position de Maxime`)
+      .setTitle("📍 Dernière position de Maxime")
       .setDescription(`**${place}**, ${country}\n🗓️ ${date}\n\n${description}`)
       .setFooter({ text: "MaxTripBot • Données Polarsteps" });
 
