@@ -138,8 +138,10 @@ export async function getDataPayload<T = unknown>(
     if (dataPath === "nb_steps") {
       const lastModified = (payload.last_modified || []).pop()?.start_time;
 
-      const last = DateTime.fromISO(lastModified, { zone: "utc" });
-      const now = DateTime.now().setZone("utc");
+      const last = DateTime.fromISO(lastModified, {
+        zone: payload.timezone_id,
+      });
+      const now = DateTime.now().setZone(payload.timezone_id);
 
       const diff = now.diff(last, ["days", "hours", "minutes"]).toObject();
 
