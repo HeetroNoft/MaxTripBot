@@ -1,4 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { getDataPayload } from "../../utils/dataPayload";
 
 export const data = new SlashCommandBuilder()
   .setName("maxpolar")
@@ -18,7 +19,7 @@ export async function execute({
   const polarLink =
     "https://www.polarsteps.com/MaximeCrosne/22019906-australie?s=8b079af3-2be6-476e-9ba8-a83448df30c9&referral=true";
   const pictureUrl =
-    "https://screenshots.prod.polarsteps.dev/?url=https%3A%2F%2Fwww.polarsteps.com%2Fshare_social%2Ftrip%2F22019906%3Fs%3D8b079af3-2be6-476e-9ba8-a83448df30c9&width=1080&height=1080&token=6cedf2961f17ae4ff52382ce28a49e62&success_var=screenshotIsReady&failure_var=screenshotWontBeReady&last_mod=1759496927";
+    (await getDataPayload<string>("cover_photo.large_thumbnail_path")) || null;
   const userId = "328795495936032768";
   const user = await client.users.fetch(userId);
 

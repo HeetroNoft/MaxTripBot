@@ -1,6 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import fs from "fs-extra";
-import path from "path";
+import { getDataPayload } from "../../utils/dataPayload";
 
 // Interface pour typer la réponse Open-Meteo
 interface OpenMeteoResponse {
@@ -19,27 +18,15 @@ export const data = new SlashCommandBuilder()
   );
 export const aliases = ["maxweather"];
 
-export async function execute({ interaction, message }: any) {
+export async function execute({ interaction }: any) {
   await interaction.deferReply();
 
   try {
-    const PAYLOAD_FILE = path.resolve("./data/payload.json");
-    // Coordonnées de Maxime (exemple : Perth, Australie)
-    const latestStep = (await fs.readJson(PAYLOAD_FILE)).steps.sort(
-      (a: any, b: any) =>
-        new Date(b.start_time || b.creation_time).getTime() -
-        new Date(a.start_time || a.creation_time).getTime()
-    )[0];
-
-    if (!latestStep) {
-      return interaction.editReply(
-        "😕 Impossible de trouver la dernière step sur Polarsteps."
-      );
-    }
-
-    const location = latestStep.location.full_detail || "Lieu inconnu";
-    const lat = latestStep.location.lat || -31.57;
-    const lon = latestStep.location.lon || 115.52;
+    // Récupérer les coordonnées depuis la dernière step via getDataPayload
+    const location =
+      (await getDataPayload("location.full_detail", true)) || "Lieu inconnu";
+    const lat = (await getDataPayload("location.lat", true)) ?? -31.57;
+    const lon = (await getDataPayload("location.lon", true)) ?? 115.52;
 
     const params = new URLSearchParams({
       latitude: lat.toString(),
@@ -66,15 +53,12 @@ export async function execute({ interaction, message }: any) {
     const windspeed = cw.windspeed;
     const weathercode = cw.weathercode;
 
-    // Déterminer description météo + emoji
     const { description, emoji } = weathercodeToTextAndEmoji(weathercode);
 
-    // Ajouter un emoji chaud/froid selon la température
-    let tempEmoji = "🌡️"; // neutre
+    let tempEmoji = "🌡️";
     if (temp >= 30) tempEmoji = "🔥";
     else if (temp <= 10) tempEmoji = "❄️";
 
-    // 🔹 Créer l'embed
     const embed = new EmbedBuilder()
       .setTitle(`🌤️ Météo à ${location}`)
       .setColor("#1E90FF")
