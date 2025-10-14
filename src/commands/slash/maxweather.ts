@@ -1,4 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import fs from "fs-extra";
+import path from "path";
 
 // Interface pour typer la réponse Open-Meteo
 interface OpenMeteoResponse {
@@ -21,9 +23,22 @@ export async function execute({ interaction, message }: any) {
   await interaction.deferReply();
 
   try {
+    const PAYLOAD_FILE = path.resolve("./data/payload.json");
     // Coordonnées de Maxime (exemple : Perth, Australie)
-    const lat = -31.57;
-    const lon = 115.52;
+    const latestStep = (await fs.readJson(PAYLOAD_FILE)).steps.sort(
+      (a: any, b: any) =>
+        new Date(b.start_time || b.creation_time).getTime() -
+        new Date(a.start_time || a.creation_time).getTime()
+    )[0];
+
+    if (!latestStep) {
+      return interaction.editReply(
+        "😕 Impossible de trouver la dernière step sur Polarsteps."
+      );
+    }
+
+    const lat = latestStep.location.lat || -31.57;
+    const lon = latestStep.location.lon || 115.52;
 
     const params = new URLSearchParams({
       latitude: lat.toString(),
