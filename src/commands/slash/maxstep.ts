@@ -1,11 +1,15 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import puppeteer from "puppeteer";
 import fs from "fs-extra";
+import { DateTime } from "luxon";
+import path from "path";
 
 const EMAIL = process.env.POLAR_EMAIL!;
 const PASSWORD = process.env.POLAR_PASS!;
 const TRIP_URL =
   "https://www.polarsteps.com/MaximeCrosne/22019906-australie?s=8b079af3-2be6-476e-9ba8-a83448df30c9&referral=true";
+
+const PAYLOAD_FILE = path.resolve("./data/payload.json");
 
 export const data = new SlashCommandBuilder()
   .setName("maxstep")
@@ -25,120 +29,97 @@ export async function execute({ interaction }: any) {
   }
 
   try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-    const page = await browser.newPage();
+    let payload: any = null;
 
-    const payloads: any[] = [];
+    // Vérifie si le fichier existe et sa date
+    if (await fs.pathExists(PAYLOAD_FILE)) {
+      const stats = await fs.stat(PAYLOAD_FILE);
+      const ageInMs = Date.now() - stats.mtime.getTime();
 
-    page.on("response", async (resp) => {
-      try {
-        const url = resp.url();
-        const ct = resp.headers()["content-type"] || "";
-        if (!ct.includes("application/json")) return;
-
-        const text = await resp.text();
-        if (text.includes('"steps"') || text.includes('"trip"')) {
-          const json = JSON.parse(text);
-          payloads.push({ url, json });
-        }
-      } catch {}
-    });
-
-    // Aller sur la page de connexion
-    await page.goto("https://www.polarsteps.com/login", {
-      waitUntil: "networkidle2",
-    });
-
-    // Remplir email
-    await page.waitForSelector(
-      'input[type="email"], input[name="email"], input[name="username"]',
-      { timeout: 10000 }
-    );
-    await page.type(
-      'input[type="email"], input[name="email"], input[name="username"]',
-      EMAIL,
-      { delay: 50 }
-    );
-
-    // Remplir mot de passe
-    await page.waitForSelector('input[type="password"]', { timeout: 10000 });
-    await page.type('input[type="password"]', PASSWORD, { delay: 50 });
-
-    // Trouver un bouton de connexion valide
-    const possibleButtons = [
-      'button[type="submit"]',
-      'button[data-testid="login-button"]',
-      'button[class*="login"]',
-      'button[class*="submit"]',
-    ];
-
-    let buttonFound = false;
-    for (const selector of possibleButtons) {
-      const btn = await page.$(selector);
-      if (btn) {
-        await Promise.all([
-          btn.click(),
-          page
-            .waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 })
-            .catch(() => {}),
-        ]);
-        buttonFound = true;
-        break;
+      if (ageInMs < 1000 * 60 * 60) {
+        // Moins d'une heure → on réutilise l'ancien payload
+        payload = await fs.readJson(PAYLOAD_FILE);
       }
     }
 
-    if (!buttonFound) {
+    // Si pas de payload ou trop vieux, on récupère
+    if (!payload) {
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+      const page = await browser.newPage();
+
+      const payloads: any[] = [];
+
+      page.on("response", async (resp) => {
+        try {
+          const ct = resp.headers()["content-type"] || "";
+          if (!ct.includes("application/json")) return;
+
+          const text = await resp.text();
+          if (text.includes('"steps"') || text.includes('"trip"')) {
+            payloads.push(JSON.parse(text));
+          }
+        } catch {}
+      });
+
+      await page.goto(TRIP_URL, { waitUntil: "networkidle2" });
+      await new Promise((r) => setTimeout(r, 4000));
+
       await browser.close();
-      return interaction.editReply(
-        "❌ Impossible de trouver le bouton de connexion sur Polarsteps."
-      );
+
+      // Filtre pour ne garder que l'ID 22019906
+      payload = payloads
+        .map((p) => p?.trip || p)
+        .find((p) => p?.id === 22019906);
+
+      if (!payload) {
+        return interaction.editReply(
+          "😕 Impossible de trouver le voyage Polarsteps avec l'ID 22019906."
+        );
+      }
+
+      // Sauvegarde (écrase l'ancien fichier)
+      await fs.ensureDir("./data");
+      await fs.writeJson(PAYLOAD_FILE, payload, { spaces: 2 });
     }
 
-    // Accéder au voyage
-    await page.goto(TRIP_URL, { waitUntil: "networkidle2", timeout: 60000 });
-    await new Promise((resolve) => setTimeout(resolve, 4000));
-
-    // Sauvegarde des payloads pour debug
-    await fs.ensureDir("./polarsteps-output");
-    const outputFile = `./polarsteps-output/payloads-${Date.now()}.json`;
-    await fs.writeJson(outputFile, payloads, { spaces: 2 });
-
-    // Extraire la dernière étape
-    const latestStep = payloads
-      .flatMap((p) => p.json?.trip?.steps || p.json?.data?.trip?.steps || [])
-      .filter(Boolean)
-      .sort(
-        (a, b) =>
-          new Date(b.startDate || b.date).getTime() -
-          new Date(a.startDate || a.date).getTime()
-      )[0];
+    // Dernière step
+    const latestStep = (payload.steps || []).sort(
+      (a: any, b: any) =>
+        new Date(b.start_time || b.creation_time).getTime() -
+        new Date(a.start_time || a.creation_time).getTime()
+    )[0];
 
     if (!latestStep) {
-      await browser.close();
       return interaction.editReply(
-        "😕 Impossible de trouver la dernière position sur Polarsteps."
+        "😕 Impossible de trouver la dernière step sur Polarsteps."
       );
     }
 
-    const place = latestStep.location?.name || "Lieu inconnu";
-    const country = latestStep.location?.country || "";
-    const date = latestStep.startDate || latestStep.date || "Date inconnue";
-    const description = latestStep.text || "Pas de description disponible.";
-    const image = latestStep.coverPhoto?.url || null;
+    const place = latestStep.location.full_detail || "Lieu inconnu";
+    const date =
+      latestStep.start_time || latestStep.creation_time || "Date inconnue";
+    const dt = DateTime.fromISO(date, { zone: "Europe/Paris" });
 
-    // Création de l'embed Discord
+    const description =
+      latestStep.description || "Pas de description disponible.";
+    const image =
+      latestStep.media?.at(-1)?.path || latestStep.screenshot_url || null;
+
     const embed = new EmbedBuilder()
       .setColor(0x00aaff)
       .setTitle("📍 Dernière position de Maxime")
-      .setDescription(`**${place}**, ${country}\n🗓️ ${date}\n\n${description}`)
+      .setDescription(
+        `**${place}**\n🗓️ ${dt.toFormat(
+          "dd LLLL yyyy 'à' HH:mm:ss"
+        )}\n\n${description}`
+      )
       .setFooter({ text: "MaxTripBot • Données Polarsteps" });
 
     if (image) embed.setImage(image);
 
-    await browser.close();
     await interaction.editReply({ embeds: [embed] });
   } catch (err) {
     console.error("Erreur Polarsteps:", err);
