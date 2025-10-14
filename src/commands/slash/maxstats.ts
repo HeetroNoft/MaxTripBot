@@ -69,10 +69,12 @@ export async function execute({
       const maxEntry = Object.entries(statsPerDay).reduce((a, b) =>
         b[1] > a[1] ? b : a
       );
-      const day = DateTime.fromISO(maxEntry[0]).setZone("Europe/Paris");
-      maxDayText = `${day.toLocaleString(DateTime.DATE_FULL)} — ${
-        maxEntry[1]
-      } MaxLove`;
+
+      const day = DateTime.fromISO(maxEntry[0])
+        .setLocale("fr")
+        .toLocaleString(DateTime.DATE_FULL);
+
+      maxDayText = `${day} (${maxEntry[1]} MaxLoves)`;
     }
 
     const embed = new EmbedBuilder()
