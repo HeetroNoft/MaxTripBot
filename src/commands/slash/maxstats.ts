@@ -2,6 +2,7 @@ import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
   getMaxLoveCount,
   getMaxLoveLeaderboard,
+  getMaxLoveStatsPerDay, // <-- ajouter l'import
 } from "../../utils/maxLoveManager";
 import { getDataPayload } from "../../utils/dataPayload";
 import { DateTime } from "luxon";
@@ -38,9 +39,7 @@ export async function execute({
       zone: "Europe/Paris",
     }).startOf("day");
     let diffDays = Math.floor(today.diff(departDate, "days").days) + " jours";
-    if (diffDays === "0 jours") {
-      diffDays = "Aujourd'hui";
-    }
+    if (diffDays === "0 jours") diffDays = "Aujourd'hui";
 
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
@@ -63,15 +62,32 @@ export async function execute({
             .join("\n")
         : "Aucun MaxLove pour le moment 😢";
 
+    // --- NOUVEAU : stats par jour ---
+    const statsPerDay = getMaxLoveStatsPerDay();
+    let maxDayText = "Aucun MaxLove envoyé";
+    if (Object.keys(statsPerDay).length > 0) {
+      const maxEntry = Object.entries(statsPerDay).reduce((a, b) =>
+        b[1] > a[1] ? b : a
+      );
+      const day = DateTime.fromISO(maxEntry[0]).setZone("Europe/Paris");
+      maxDayText = `${day.toLocaleString(DateTime.DATE_FULL)} — ${
+        maxEntry[1]
+      } MaxLove`;
+    }
+
     const embed = new EmbedBuilder()
       .setColor(0xff66cc)
       .setTitle("📊 MaxStats")
       .setDescription(
-        `**📅 Nombre de jours depuis le départ :** ${diffDays}\n\n**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**🎯 Nombre d'étapes :** ${totalSteps}\n\n**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
+        `**📅 Nombre de jours depuis le départ :** ${diffDays}\n\n` +
+          `**📏 Kilomètres parcourus :** ${totalDistance}km\n\n` +
+          `**🎯 Nombre d'étapes :** ${totalSteps}\n\n` +
+          `**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n` +
+          `**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n` +
+          `**📈 Jour avec le plus de MaxLove :** ${maxDayText}\n\n` +
+          `**🏆 Top 5 MaxLove :**\n${topMaxLove}`
       )
-      .setFooter({
-        text: "MaxTripBot • Stats",
-      });
+      .setFooter({ text: "MaxTripBot • Stats" });
 
     if (interaction) await interaction.reply({ embeds: [embed] });
     else if (message) await message.reply({ embeds: [embed] });
