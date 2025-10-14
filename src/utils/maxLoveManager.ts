@@ -12,6 +12,7 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 interface UserData {
   count: number;
   lastUsed: number;
+  history: number[]; // nouveau : liste des timestamps
 }
 
 interface MaxLoveData {
@@ -30,9 +31,11 @@ try {
 
 // Fonctions
 export function addMaxLove(userId: string) {
-  if (!data[userId]) data[userId] = { count: 0, lastUsed: 0 };
+  if (!data[userId]) data[userId] = { count: 0, lastUsed: 0, history: [] };
+  const now = Date.now();
   data[userId].count++;
-  data[userId].lastUsed = Date.now();
+  data[userId].lastUsed = now;
+  data[userId].history.push(now); // ajouter le timestamp
   saveData();
 }
 
@@ -61,6 +64,20 @@ export function getCooldownRemaining(userId: string) {
   const lastUsed = data[userId]?.lastUsed || 0;
   const remaining = COOLDOWN_DURATION - (Date.now() - lastUsed);
   return remaining > 0 ? remaining : 0;
+}
+
+// Nouvelle fonction : stats par jour
+export function getMaxLoveStatsPerDay() {
+  const stats: Record<string, number> = {}; // { "2025-10-14": 5 }
+
+  Object.values(data).forEach((user) => {
+    user.history.forEach((timestamp) => {
+      const day = new Date(timestamp).toISOString().split("T")[0]; // YYYY-MM-DD
+      stats[day] = (stats[day] || 0) + 1;
+    });
+  });
+
+  return stats;
 }
 
 // Sauvegarde
