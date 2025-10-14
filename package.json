@@ -19,13 +19,16 @@
   "dependencies": {
     "discord.js": "^14.22.1",
     "dotenv": "^17.2.3",
+    "fs-extra": "^11.3.2",
     "instagram-url-direct": "^2.0.7",
     "luxon": "^3.7.2",
     "moment-timezone": "^0.6.0",
     "node-cron": "^4.2.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^24.24.1"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "@types/luxon": "^3.7.1",
     "@types/node": "^24.6.2",
     "@types/node-fetch": "^2.6.13",
