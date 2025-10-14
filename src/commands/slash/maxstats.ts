@@ -51,7 +51,7 @@ export async function execute({
     .setColor(0xff66cc)
     .setTitle("📊 MaxStats")
     .setDescription(
-      `**📏 Kilomètres parcourus : ${totalDistance}km**\n\n**💗 Total de MaxLove envoyés : ${totalMaxLove} ❤️**\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
+      `**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove} ❤️\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
     )
     .setFooter({
       text: "MaxTripBot • Stats",
