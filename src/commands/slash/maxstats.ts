@@ -4,6 +4,7 @@ import {
   getMaxLoveLeaderboard,
 } from "../../utils/maxLoveManager";
 import { getDataPayload } from "../../utils/dataPayload";
+import { DateTime } from "luxon";
 
 export const data = new SlashCommandBuilder()
   .setName("maxstats")
@@ -30,6 +31,14 @@ export async function execute({
     const totalSteps = await getDataPayload<number>("nb_steps");
     const allFlags = await getDataPayload<string[]>("flag_countries");
 
+    const departISO = process.env.MAX_DEPART as string;
+    const nowParis = DateTime.now().setZone("Europe/Paris");
+    const today = nowParis.startOf("day");
+    const departDate = DateTime.fromISO(departISO, {
+      zone: "Europe/Paris",
+    }).startOf("day");
+    const diffDays = Math.floor(today.diff(departDate, "days").days);
+
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
 
@@ -55,7 +64,7 @@ export async function execute({
       .setColor(0xff66cc)
       .setTitle("📊 MaxStats")
       .setDescription(
-        `**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**🎯 Nombre d'étapes :** ${totalSteps}\n\n**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
+        `**📅 Nombre de jours depuis le départ :** ${diffDays} jours\n\n**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**🎯 Nombre d'étapes :** ${totalSteps}\n\n**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
       )
       .setFooter({
         text: "MaxTripBot • Stats",
