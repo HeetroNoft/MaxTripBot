@@ -47,12 +47,12 @@ export async function execute({ interaction }: any) {
       } catch {}
     });
 
-    // Accès à la page de connexion
+    // Aller sur la page de connexion
     await page.goto("https://www.polarsteps.com/login", {
       waitUntil: "networkidle2",
     });
 
-    // Sélecteurs mis à jour pour le nouveau formulaire Polarsteps
+    // Remplir email
     await page.waitForSelector(
       'input[type="email"], input[name="email"], input[name="username"]',
       { timeout: 10000 }
@@ -63,30 +63,50 @@ export async function execute({ interaction }: any) {
       { delay: 50 }
     );
 
+    // Remplir mot de passe
     await page.waitForSelector('input[type="password"]', { timeout: 10000 });
     await page.type('input[type="password"]', PASSWORD, { delay: 50 });
 
-    await Promise.all([
-      page.click(
-        'button[type="submit"], button:has-text("Log in"), button:has-text("Sign in")'
-      ),
-      page
-        .waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 })
-        .catch(() => {}),
-    ]);
+    // Trouver un bouton de connexion valide
+    const possibleButtons = [
+      'button[type="submit"]',
+      'button[data-testid="login-button"]',
+      'button[class*="login"]',
+      'button[class*="submit"]',
+    ];
 
-    // Navigation vers le trip
+    let buttonFound = false;
+    for (const selector of possibleButtons) {
+      const btn = await page.$(selector);
+      if (btn) {
+        await Promise.all([
+          btn.click(),
+          page
+            .waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 })
+            .catch(() => {}),
+        ]);
+        buttonFound = true;
+        break;
+      }
+    }
+
+    if (!buttonFound) {
+      await browser.close();
+      return interaction.editReply(
+        "❌ Impossible de trouver le bouton de connexion sur Polarsteps."
+      );
+    }
+
+    // Accéder au voyage
     await page.goto(TRIP_URL, { waitUntil: "networkidle2", timeout: 60000 });
     await new Promise((resolve) => setTimeout(resolve, 4000));
 
-    // Sauvegarde des données pour debug
+    // Sauvegarde des payloads pour debug
     await fs.ensureDir("./polarsteps-output");
-    await fs.writeJson(
-      `./polarsteps-output/payloads-${Date.now()}.json`,
-      payloads,
-      { spaces: 2 }
-    );
+    const outputFile = `./polarsteps-output/payloads-${Date.now()}.json`;
+    await fs.writeJson(outputFile, payloads, { spaces: 2 });
 
+    // Extraire la dernière étape
     const latestStep = payloads
       .flatMap((p) => p.json?.trip?.steps || p.json?.data?.trip?.steps || [])
       .filter(Boolean)
@@ -109,6 +129,7 @@ export async function execute({ interaction }: any) {
     const description = latestStep.text || "Pas de description disponible.";
     const image = latestStep.coverPhoto?.url || null;
 
+    // Création de l'embed Discord
     const embed = new EmbedBuilder()
       .setColor(0x00aaff)
       .setTitle("📍 Dernière position de Maxime")
