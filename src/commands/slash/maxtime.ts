@@ -48,8 +48,8 @@ export async function execute({
     .setColor(0x1e90ff)
     .setTitle("⏰ Heures actuelles")
     .setDescription(
-      `🇫🇷 France (Paris) : ${franceTime.toFormat("HH:mm")}\n` +
-        `${maxCountryFlag} ${maxLocation} (${maxLocationCity}) : ${maxTime.toFormat(
+      `**🇫🇷 France (Paris) :** ${franceTime.toFormat("HH:mm")}\n` +
+        `**${maxCountryFlag} ${maxLocation} (${maxLocationCity}) :** ${maxTime.toFormat(
           "HH:mm"
         )}\n` +
         `\nDifférence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
