@@ -7,7 +7,7 @@ import { getDataPayload } from "../../utils/dataPayload";
 
 export const data = new SlashCommandBuilder()
   .setName("maxstats")
-  .setDescription("Affiche le nombre de MaxLove envoyés");
+  .setDescription("Affiche les statistiques du voyage de Maxime");
 
 export const aliases = ["maxstats"];
 
