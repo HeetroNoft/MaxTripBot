@@ -37,7 +37,10 @@ export async function execute({
     const departDate = DateTime.fromISO(departISO, {
       zone: "Europe/Paris",
     }).startOf("day");
-    const diffDays = Math.floor(today.diff(departDate, "days").days);
+    let diffDays = Math.floor(today.diff(departDate, "days").days) + " jours";
+    if (diffDays === "0 jours") {
+      diffDays = "Aujourd'hui";
+    }
 
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
@@ -64,7 +67,7 @@ export async function execute({
       .setColor(0xff66cc)
       .setTitle("📊 MaxStats")
       .setDescription(
-        `**📅 Nombre de jours depuis le départ :** ${diffDays} jours\n\n**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**🎯 Nombre d'étapes :** ${totalSteps}\n\n**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
+        `**📅 Nombre de jours depuis le départ :** ${diffDays}\n\n**📏 Kilomètres parcourus :** ${totalDistance}km\n\n**🎯 Nombre d'étapes :** ${totalSteps}\n\n**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n**🏆 Top 5 MaxLove :**\n${topMaxLove}`
       )
       .setFooter({
         text: "MaxTripBot • Stats",
