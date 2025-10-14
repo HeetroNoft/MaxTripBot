@@ -22,9 +22,13 @@ export async function execute({ interaction }: any) {
       );
     }
 
-    const today = DateTime.now().startOf("day");
-    const departDate = DateTime.fromISO(departISO).startOf("day");
-    const diffDays = today.diff(departDate, "days").days;
+    // 🕓 Gestion précise des fuseaux horaires
+    const nowParis = DateTime.now().setZone("Europe/Paris");
+    const today = nowParis.startOf("day");
+    const departDate = DateTime.fromISO(departISO, {
+      zone: "Europe/Paris",
+    }).startOf("day");
+    const diffDays = Math.floor(today.diff(departDate, "days").days);
 
     // 🔹 Si la date de départ n’est pas encore arrivée
     if (diffDays < 0) {
