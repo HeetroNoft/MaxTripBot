@@ -32,6 +32,10 @@ export async function execute({
   );
   const maxLocation =
     (await getDataPayload("location.country", true)) || "Lieu inconnu";
+  const maxLocationCity =
+    ((await getDataPayload("slug", true)) as string).replace(/^./, (str) =>
+      str.toUpperCase()
+    ) || "Ville inconnue";
   const countryCode =
     (await getDataPayload<string>("location.country_code", true)) || "";
   const maxCountryFlag = countryCodeToFlagEmoji(countryCode);
@@ -45,7 +49,9 @@ export async function execute({
     .setTitle("⏰ Heures actuelles")
     .setDescription(
       `🇫🇷 France (Paris) : ${franceTime.toFormat("HH:mm")}\n` +
-        `${maxCountryFlag} ${maxLocation} : ${maxTime.toFormat("HH:mm")}\n` +
+        `${maxCountryFlag} ${maxLocation} (${maxLocationCity}) : ${maxTime.toFormat(
+          "HH:mm"
+        )}\n` +
         `\nDifférence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
     )
     .setFooter({ text: "MaxTripBot • Time Info" });
