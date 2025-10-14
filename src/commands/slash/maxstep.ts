@@ -14,7 +14,7 @@ const PAYLOAD_FILE = path.resolve("./data/payload.json");
 export const data = new SlashCommandBuilder()
   .setName("maxstep")
   .setDescription(
-    "📍 Affiche la dernière position connue de Maxime sur Polarsteps"
+    "Affiche la dernière position connue de Maxime sur Polarsteps"
   );
 
 export const aliases = ["maxloc", "maxmap"];
