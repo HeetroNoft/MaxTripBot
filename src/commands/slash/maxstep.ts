@@ -112,11 +112,11 @@ export async function execute({ interaction }: any) {
 
     const embed = new EmbedBuilder()
       .setColor(0x00aaff)
-      .setTitle(`📍 ${title}`)
+      .setTitle(`${title}`)
       .setDescription(
-        `**${place}**\n🗓️ ${dt.toFormat("dd LLLL yyyy 'à' HH:mm:ss")}\n\n🌡️ ${
-          temperature ? `${temperature}°C` : "Température inconnue"
-        }\n\n${description}`
+        `${description}\n\n📍 **${place}**\n🗓️ ${dt.toFormat(
+          "dd LLLL yyyy 'à' HH:mm:ss"
+        )}\n🌡️ ${temperature ? `${temperature}°C` : "Température inconnue"}`
       )
       .setFooter({ text: "MaxTripBot • Données Polarsteps" });
 
