@@ -16,7 +16,7 @@ export async function updatePayload(): Promise<any | undefined> {
     if (await fs.pathExists(PAYLOAD_FILE)) {
       const stats = await fs.stat(PAYLOAD_FILE);
       const ageInMs = Date.now() - stats.mtime.getTime();
-      if (ageInMs < 1000 * 60 * 60) {
+      if (ageInMs < 1000 * 60 * 10) {
         const localPayload = await fs.readJson(PAYLOAD_FILE);
         return localPayload;
       }
