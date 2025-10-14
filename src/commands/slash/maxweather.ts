@@ -37,6 +37,7 @@ export async function execute({ interaction, message }: any) {
       );
     }
 
+    const location = latestStep.location.full_detail || "Lieu inconnu";
     const lat = latestStep.location.lat || -31.57;
     const lon = latestStep.location.lon || 115.52;
 
@@ -75,7 +76,7 @@ export async function execute({ interaction, message }: any) {
 
     // 🔹 Créer l'embed
     const embed = new EmbedBuilder()
-      .setTitle(`🌤️ Météo à Perth`)
+      .setTitle(`🌤️ Météo à ${location}`)
       .setColor("#1E90FF")
       .addFields(
         { name: "Température", value: `${tempEmoji} ${temp}°C`, inline: true },
