@@ -1,5 +1,6 @@
 // src/utils/MaxLoveManager.ts
 import fs from "fs";
+import { DateTime } from "luxon";
 import path from "path";
 
 const DATA_DIR = path.join(__dirname, "../../data");
@@ -75,7 +76,7 @@ export function getMaxLoveStatsPerDay() {
     user.history.forEach((timestamp) => {
       const day = DateTime.fromMillis(timestamp)
         .setZone("Europe/Paris")
-        .toISODate(); // format "YYYY-MM-DD" en heure française
+        .toISODate() as string; // format "YYYY-MM-DD" en heure française
       stats[day] = (stats[day] || 0) + 1;
     });
   });
