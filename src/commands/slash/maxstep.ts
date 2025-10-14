@@ -104,7 +104,7 @@ export async function execute({ interaction }: any) {
     const dt = DateTime.fromISO(date, { zone: "Europe/Paris" });
 
     const title = latestStep.display_name || "Dernière position de Maxime";
-    const temperature = latestStep.weather_temperature?.temperature;
+    const temperature = latestStep.weather_temperature;
     const description =
       latestStep.description || "Pas de description disponible.";
     const image =
