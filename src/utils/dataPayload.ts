@@ -17,7 +17,6 @@ export async function updatePayload(): Promise<any | undefined> {
       const ageInMs = Date.now() - stats.mtime.getTime();
       if (ageInMs < 1000 * 60 * 60) {
         const localPayload = await fs.readJson(PAYLOAD_FILE);
-        console.log("Payload chargé depuis le fichier local.");
         return localPayload;
       }
     }
@@ -156,7 +155,6 @@ export async function getDataPayload<T = unknown>(
       }
     }
 
-    console.log(`Clé trouvée: ${keys.at(-1)} →`, result);
     return result as T;
   } catch (err) {
     console.error("Erreur dans getDataPayload:", err);
