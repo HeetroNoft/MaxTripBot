@@ -22,20 +22,10 @@ export async function execute({
   client: any;
 }) {
   const PAYLOAD_FILE = path.resolve("./data/payload.json");
-  // Coordonnées de Maxime (exemple : Perth, Australie)
-  const latestStep = (await fs.readJson(PAYLOAD_FILE)).steps.sort(
-    (a: any, b: any) =>
-      new Date(b.start_time || b.creation_time).getTime() -
-      new Date(a.start_time || a.creation_time).getTime()
-  )[0];
 
-  if (!latestStep) {
-    return interaction.editReply(
-      "😕 Impossible de trouver la dernière step sur Polarsteps."
-    );
-  }
-
-  const totalDistance = latestStep.total_km.toFixed(1) || "Distance inconnue";
+  const totalDistance =
+    (await fs.readJson(PAYLOAD_FILE)).total_km.toFixed(1) ||
+    "Distance inconnue";
   const totalMaxLove = getMaxLoveCount();
   const leaderboard = getMaxLoveLeaderboard();
 
