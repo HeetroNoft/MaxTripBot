@@ -39,9 +39,13 @@ export async function execute({ interaction }: any) {
   // Récupère le dernier media si disponible
   const mediaArray = (await getDataPayload<any>("media", true)) || [];
   const lastMedia =
-    mediaArray.length > 0 ? mediaArray[mediaArray.length - 1].path : null;
+    mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
   const image =
-    lastMedia || (await getDataPayload<string>("screenshot_url", true)) || null;
+    lastMedia?.path ||
+    lastMedia?.large_thumbnail_path ||
+    lastMedia?.small_thumbnail_path ||
+    (await getDataPayload<string>("screenshot_url", true)) ||
+    null;
 
   const embed = new EmbedBuilder()
     .setColor(0x00aaff)
