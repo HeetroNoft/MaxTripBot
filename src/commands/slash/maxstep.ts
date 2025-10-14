@@ -47,7 +47,7 @@ export async function execute({ interaction }: any) {
     .setColor(0x00aaff)
     .setTitle(title)
     .setDescription(
-      `${description}\n📍 **${place}**\n🗓️ ${dt.toFormat(
+      `${description}\n\n📍 **${place}**\n🗓️ ${dt.toFormat(
         "dd LLLL yyyy 'à' HH:mm:ss"
       )}\n🌡️ ${
         temperature !== "Température inconnue"
