@@ -1,6 +1,7 @@
 import path from "path";
 import puppeteer from "puppeteer";
 import fs from "fs-extra";
+import { DateTime } from "luxon";
 
 const TRIP_URL =
   "https://www.polarsteps.com/MaximeCrosne/22019906-australie?s=8b079af3-2be6-476e-9ba8-a83448df30c9&referral=true";
@@ -131,8 +132,26 @@ export async function getDataPayload<T = unknown>(
       return flags as any;
     }
 
-    if (dataPath === "nb_steps") {
+    if (dataPath === "timeSinceUpdate") {
       return payload.steps.length as any;
+    }
+    if (dataPath === "nb_steps") {
+      const lastModified = (payload.last_modified || []).pop()?.start_time;
+
+      const last = DateTime.fromISO(lastModified, { zone: "utc" });
+      const now = DateTime.now().setZone("utc");
+
+      const diff = now.diff(last, ["days", "hours", "minutes"]).toObject();
+
+      if (diff.days && diff.days >= 1) {
+        return `${Math.floor(diff.days)}j` as any;
+      } else if (diff.hours && diff.hours >= 1) {
+        return `${Math.floor(diff.hours)}h` as any;
+      } else if (diff.minutes && diff.minutes >= 1) {
+        return `${Math.floor(diff.minutes)}min` as any;
+      } else {
+        return "quelques secondes" as any;
+      }
     }
 
     if (!dataPath) {

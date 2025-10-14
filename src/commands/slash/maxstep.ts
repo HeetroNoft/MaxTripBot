@@ -23,6 +23,8 @@ export async function execute({ interaction }: any) {
     (await getDataPayload<string>("creation_time", true)) ||
     "Date inconnue";
   const dt = DateTime.fromISO(dateISO, { zone: "Europe/Paris" });
+  const timeSinceUpdate =
+    (await getDataPayload<string>("timeSinceUpdate")) || "quelques temps";
 
   const title =
     (await getDataPayload<string>("display_name", true)) ||
@@ -53,7 +55,9 @@ export async function execute({ interaction }: any) {
           : temperature
       }`
     )
-    .setFooter({ text: "MaxTripBot • Données Polarsteps" });
+    .setFooter({
+      text: `Données Polarsteps • Dernière mise à jour il y a ${timeSinceUpdate}`,
+    });
 
   if (image) embed.setImage(image);
 
