@@ -4,9 +4,11 @@ import { getDataPayload } from "../../utils/dataPayload";
 
 export const data = new SlashCommandBuilder()
   .setName("maxtime")
-  .setDescription("Affiche l'heure Australie / France et la différence");
+  .setDescription(
+    "Affiche l'heure de la dernière position connue de Maxime / France et la différence"
+  );
 
-export const aliases = ["maxtime"];
+export const aliases = ["maxtime ", "maxheure"];
 
 function countryCodeToFlagEmoji(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return "🏳️"; // drapeau blanc par défaut
