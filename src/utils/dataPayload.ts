@@ -136,7 +136,7 @@ export async function getDataPayload<T = unknown>(
       return payload.steps.length as any;
     }
     if (dataPath === "timeSinceUpdate") {
-      const lastModified = (payload.last_modified || []).pop()?.start_time;
+      const lastModified = payload.last_modified || null;
 
       const last = DateTime.fromISO(lastModified, {
         zone: payload.timezone_id,
