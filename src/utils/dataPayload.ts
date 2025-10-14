@@ -144,14 +144,19 @@ export async function getDataPayload<T = unknown>(
       const now = DateTime.now().setZone(payload.timezone_id);
 
       const diff = now.diff(last, ["days", "hours", "minutes"]).toObject();
+      console.log("all", diff);
 
       if (diff.days && diff.days >= 1) {
+        console.log("days", diff);
         return `${Math.floor(diff.days)}j` as any;
       } else if (diff.hours && diff.hours >= 1) {
+        console.log("hours", diff);
         return `${Math.floor(diff.hours)}h` as any;
       } else if (diff.minutes && diff.minutes >= 1) {
+        console.log("minutes", diff);
         return `${Math.floor(diff.minutes)}min` as any;
       } else {
+        console.log("seconds", diff);
         return "quelques secondes" as any;
       }
     }
