@@ -78,6 +78,8 @@ export async function getDataPayload<T = unknown>(
     const payload = await updatePayload();
     if (!payload) return undefined;
 
+    let useZelda = false;
+
     let target = payload;
     if (latestOnly) {
       const latestStep = (payload.steps || []).sort(
@@ -85,14 +87,40 @@ export async function getDataPayload<T = unknown>(
           new Date(b.start_time || b.creation_time).getTime() -
           new Date(a.start_time || a.creation_time).getTime()
       )[0];
+
+      // Récupérer les coordonnées depuis la dernière step via getDataPayload
+      const lastStepTime =
+        latestStep.start_time || latestStep.creation_time || null;
+      const zeldaSteps = (await payload.zelda_steps) || [];
+
+      let latestZelda: any = null;
+      if (zeldaSteps.length > 0) {
+        latestZelda = zeldaSteps
+          .map((z: any) => ({ ...z, dt: DateTime.fromISO(z.time) }))
+          .sort((a: any, b: any) => b.dt.toMillis() - a.dt.toMillis())[0];
+
+        if (lastStepTime) {
+          const lastStepDt = DateTime.fromISO(lastStepTime);
+          if (latestZelda.dt > lastStepDt) useZelda = true;
+        } else useZelda = true;
+      }
       if (!latestStep) {
         console.error("Aucune step trouvée.");
         return undefined;
       }
+
       target = latestStep;
+      if (useZelda && latestZelda) {
+        target = latestZelda;
+      }
     }
 
     // Gestion spéciale pour nb_country
+    if (!dataPath) {
+      console.error("Pas de clé demandée fournie à getDataPayload");
+      return undefined;
+    }
+
     if (dataPath === "nb_country") {
       return nbCountry(payload) as any;
     }
@@ -107,11 +135,6 @@ export async function getDataPayload<T = unknown>(
 
     if (dataPath === "timeSinceUpdate") {
       return lastSinceUpdate(payload) as any;
-    }
-
-    if (!dataPath) {
-      console.error("Pas de clé demandée fournie à getDataPayload");
-      return undefined;
     }
 
     const keys = dataPath

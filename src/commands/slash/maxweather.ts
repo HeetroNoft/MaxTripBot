@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { getDataPayload } from "../../utils/dataPayload";
+import { DateTime } from "luxon";
 
 // Interface pour typer la réponse Open-Meteo
 interface OpenMeteoResponse {
@@ -22,11 +23,15 @@ export async function execute({ interaction }: any) {
   await interaction.deferReply();
 
   try {
-    // Récupérer les coordonnées depuis la dernière step via getDataPayload
-    const location =
-      (await getDataPayload("location.full_detail", true)) || "Lieu inconnu";
-    const lat = (await getDataPayload("location.lat", true)) ?? -31.57;
-    const lon = (await getDataPayload("location.lon", true)) ?? 115.52;
+    let location =
+      (await getDataPayload("location.full_detail", true)) ||
+      `${await getDataPayload(
+        "location.locality",
+        true
+      )}, ${await getDataPayload("location.country", true)}` ||
+      "Lieu inconnu";
+    let lat = (await getDataPayload("location.lat", true)) ?? -31.57;
+    let lon = (await getDataPayload("location.lon", true)) ?? 115.52;
 
     const params = new URLSearchParams({
       latitude: lat.toString(),

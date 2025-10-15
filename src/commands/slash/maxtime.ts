@@ -27,31 +27,36 @@ export async function execute({
   message?: any;
 }) {
   const franceTime = DateTime.now().setZone("Europe/Paris");
-  const maxTime = DateTime.now().setZone(
-    await getDataPayload("timezone_id", true)
-  );
+  let maxTime = null as any;
+  if (await getDataPayload("timezone_id", true)) {
+    maxTime = DateTime.now().setZone(await getDataPayload("timezone_id", true));
+  }
   const maxLocation =
     (await getDataPayload("location.country", true)) || "Lieu inconnu";
+  const rawSlug = await getDataPayload("slug", true);
   const maxLocationCity =
-    ((await getDataPayload("slug", true)) as string).replace(/^./, (str) =>
-      str.toUpperCase()
-    ) || "Ville inconnue";
+    typeof rawSlug === "string" && rawSlug.length > 0
+      ? rawSlug.replace(/^./, (str) => str.toUpperCase())
+      : (await getDataPayload("location.locality", true)) || null;
   const countryCode =
     (await getDataPayload<string>("location.country_code", true)) || "";
   const maxCountryFlag = countryCodeToFlagEmoji(countryCode);
 
   // Calcul de la différence de temps en heures
-  let diffHours = maxTime.offset - franceTime.offset; // offset en minutes
-  diffHours = diffHours / 60; // convertir en heures
+  let diffHours = 0; // convertir en heures
+  if (maxTime) {
+    diffHours = maxTime.offset - franceTime.offset; // offset en minutes
+    diffHours = diffHours / 60;
+  }
 
   const embed = new EmbedBuilder()
     .setColor(0x1e90ff)
     .setTitle("⏰ Heures actuelles")
     .setDescription(
       `**🇫🇷 France (Paris) :** ${franceTime.toFormat("HH:mm")}\n` +
-        `**${maxCountryFlag} ${maxLocation} (${maxLocationCity}) :** ${maxTime.toFormat(
-          "HH:mm"
-        )}\n` +
+        `**${maxCountryFlag} ${maxLocation} ${
+          maxLocationCity ? `(${maxLocationCity})` : ""
+        } :** ${maxTime ? maxTime.toFormat("HH:mm") : "aucune donnée"}\n` +
         `\nDifférence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
     )
     .setFooter({ text: "MaxTripBot • Time Info" });
