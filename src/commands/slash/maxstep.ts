@@ -13,7 +13,6 @@ export const aliases = ["maxloc", "maxmap"];
 export async function execute({ interaction }: any) {
   await interaction.deferReply();
 
-  // --- Récupère les données principales
   const lastStepTime =
     (await getDataPayload<string>("start_time", true)) ||
     (await getDataPayload<string>("creation_time", true));
@@ -22,60 +21,49 @@ export async function execute({ interaction }: any) {
   let useZelda = false;
   let place: string = "Lieu inconnu";
   let dateISO: string = "Date inconnue";
+  let title = "Dernière position de Maxime";
+  let description =
+    (await getDataPayload<string>("description", true)) ||
+    "Pas de description disponible.";
 
   // --- Vérifie si un zelda_step plus récent existe
+  let latestZelda: any = null;
   if (zeldaSteps.length > 0) {
-    const latestZelda = zeldaSteps
-      .map((z: any) => ({
-        ...z,
-        dt: DateTime.fromISO(z.time),
-      }))
+    latestZelda = zeldaSteps
+      .map((z: any) => ({ ...z, dt: DateTime.fromISO(z.time) }))
       .sort((a: any, b: any) => b.dt.toMillis() - a.dt.toMillis())[0];
 
     if (lastStepTime) {
       const lastStepDt = DateTime.fromISO(lastStepTime);
-      if (latestZelda.dt > lastStepDt) {
-        useZelda = true;
-        place =
-          latestZelda.location?.locality ||
-          latestZelda.location?.country ||
-          "Lieu inconnu";
-        dateISO = latestZelda.time;
-      }
-    } else {
-      useZelda = true;
-      place =
-        latestZelda.location?.locality ||
-        latestZelda.location?.country ||
-        "Lieu inconnu";
-      dateISO = latestZelda.time;
-    }
+      if (latestZelda.dt > lastStepDt) useZelda = true;
+    } else useZelda = true;
   }
 
-  // --- Si pas de Zelda plus récent, utiliser les données Polarsteps normales
-  if (!useZelda) {
+  if (useZelda && latestZelda) {
+    place =
+      latestZelda.location?.locality ||
+      latestZelda.location?.country ||
+      "Lieu inconnu";
+    dateISO = latestZelda.time;
+    title = `Halte à ${latestZelda.location?.locality || place}`;
+    description = ""; // aucune description pour Zelda
+  } else {
     place =
       (await getDataPayload<string>("location.full_detail", true)) ||
       "Lieu inconnu";
     dateISO = lastStepTime || "Date inconnue";
+    title =
+      (await getDataPayload<string>("display_name", true)) ||
+      "Dernière position de Maxime";
   }
 
   const dt = DateTime.fromISO(dateISO, { zone: "Europe/Paris" });
   const timeSinceUpdate =
     (await getDataPayload<string>("timeSinceUpdate")) || "quelques temps";
-
-  const title =
-    (await getDataPayload<string>("display_name", true)) ||
-    (useZelda ? "Dernière position (Zelda)" : "Dernière position de Maxime");
-
   const temperature =
     (await getDataPayload<string>("weather_temperature", true)) ||
     "Température inconnue";
-  const description =
-    (await getDataPayload<string>("description", true)) ||
-    "Pas de description disponible.";
 
-  // --- Image si Polarsteps utilisé
   let image: string | null = null;
   if (!useZelda) {
     const mediaArray = (await getDataPayload<any>("media", true)) || [];
@@ -89,12 +77,11 @@ export async function execute({ interaction }: any) {
       null;
   }
 
-  // --- Construction de l’embed
   const embed = new EmbedBuilder()
     .setColor(useZelda ? 0xffaa00 : 0x00aaff)
     .setTitle(title)
     .setDescription(
-      `${description}\n\n📍 **${place}**\n🗓️ ${
+      `${description ? `${description}\n\n` : ""}📍 **${place}**\n🗓️ ${
         dt.isValid ? dt.toFormat("dd LLLL yyyy 'à' HH:mm:ss") : "Date inconnue"
       }\n${
         !useZelda
