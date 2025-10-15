@@ -16,8 +16,8 @@ export async function execute({
   message?: any;
   client: any;
 }) {
-  const polarLink =
-    "https://www.polarsteps.com/MaximeCrosne/22019906-australie?s=8b079af3-2be6-476e-9ba8-a83448df30c9&referral=true";
+  const TRIP_URL = process.env.TRIP_URL;
+
   const pictureUrl =
     (await getDataPayload<string>("cover_photo.large_thumbnail_path")) || null;
   const userId = "328795495936032768";
@@ -26,7 +26,7 @@ export async function execute({
   const embed = new EmbedBuilder()
     .setColor(0x4ceb34)
     .setTitle("Polarsteps de Maxime")
-    .setURL(polarLink)
+    .setURL(TRIP_URL as string)
     .setDescription(`Découvrez le voyage en Australie de Maxime 🇦🇺🦘🌏`)
     .setAuthor({ name: "Maxime Crosne" })
     .setThumbnail(user.displayAvatarURL({ size: 1024, dynamic: true }))

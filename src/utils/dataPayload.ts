@@ -3,10 +3,8 @@ import puppeteer from "puppeteer";
 import fs from "fs-extra";
 import { DateTime, Zone } from "luxon";
 
-const TRIP_URL =
-  "https://www.polarsteps.com/MaximeCrosne/22019906-australie?s=8b079af3-2be6-476e-9ba8-a83448df30c9&referral=true";
+const TRIP_URL = process.env.TRIP_URL;
 const PAYLOAD_FILE = path.resolve("./data/payload.json");
-
 /**
  * updatePayload
  * Charge le payload depuis le fichier local ou via Puppeteer si nécessaire.
@@ -42,7 +40,7 @@ export async function updatePayload(): Promise<any | undefined> {
       } catch {}
     });
 
-    await page.goto(TRIP_URL, { waitUntil: "networkidle2" });
+    await page.goto(TRIP_URL as string, { waitUntil: "networkidle2" });
     await new Promise((r) => setTimeout(r, 4000));
     await browser.close();
 
