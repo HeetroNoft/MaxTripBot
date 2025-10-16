@@ -11,6 +11,7 @@ const PAYLOAD_FILE = path.resolve("./data/payload.json");
  */
 export async function updatePayload(): Promise<any | undefined> {
   try {
+    // Vérifie si le fichier local est récent (moins de 10 min)
     if (await fs.pathExists(PAYLOAD_FILE)) {
       const stats = await fs.stat(PAYLOAD_FILE);
       const ageInMs = Date.now() - stats.mtime.getTime();
@@ -20,7 +21,13 @@ export async function updatePayload(): Promise<any | undefined> {
       }
     }
 
-    console.log("Chargement du payload via Puppeteer...");
+    // --- 🔒 Vérification de TRIP_URL avant lancement ---
+    const tripUrl = process.env.TRIP_URL?.trim();
+    if (!tripUrl || !tripUrl.startsWith("http")) {
+      throw new Error(`❌ URL TRIP_URL invalide ou manquante: "${tripUrl}"`);
+    }
+
+    console.log(`Chargement du payload via Puppeteer (${tripUrl})...`);
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -28,6 +35,7 @@ export async function updatePayload(): Promise<any | undefined> {
     const page = await browser.newPage();
 
     const payloads: any[] = [];
+
     page.on("response", async (resp) => {
       try {
         const ct = resp.headers()["content-type"] || "";
@@ -35,12 +43,15 @@ export async function updatePayload(): Promise<any | undefined> {
         const text = await resp.text();
         if (text.includes('"steps"') || text.includes('"trip"')) {
           payloads.push(JSON.parse(text));
-          console.log("Payload JSON intercepté via Puppeteer.");
+          console.log("✅ Payload JSON intercepté via Puppeteer.");
         }
-      } catch {}
+      } catch (err) {
+        console.warn("Erreur interception JSON:", err);
+      }
     });
 
-    await page.goto(TRIP_URL as string, { waitUntil: "networkidle2" });
+    // --- Navigation sécurisée ---
+    await page.goto(tripUrl, { waitUntil: "networkidle2" });
     await new Promise((r) => setTimeout(r, 4000));
     await browser.close();
 
@@ -49,17 +60,17 @@ export async function updatePayload(): Promise<any | undefined> {
       .find((p) => p?.id === 22019906);
 
     if (!payload) {
-      console.error("Aucun payload trouvé pour le trip spécifié.");
+      console.error("⚠️ Aucun payload trouvé pour le trip spécifié.");
       return undefined;
     }
 
     await fs.ensureDir("./data");
     await fs.writeJson(PAYLOAD_FILE, payload, { spaces: 2 });
-    console.log("Payload sauvegardé localement.");
+    console.log("💾 Payload sauvegardé localement.");
 
     return payload;
   } catch (err) {
-    console.error("Erreur dans updatePayload:", err);
+    console.error("❌ Erreur dans updatePayload:", err);
     return undefined;
   }
 }
