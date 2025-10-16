@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { REST, Routes } from "discord.js";
+import { REST, Routes, SlashCommandBuilder } from "discord.js";
 import type { ExtendedClient } from "../types/ExtendedClient";
 
 export async function loadSlashCommands(client: ExtendedClient) {
@@ -15,20 +15,34 @@ export async function loadSlashCommands(client: ExtendedClient) {
     const filePath = path.join(commandsPath, file);
     const commandModule = await import(filePath);
 
-    // Récupère data et execute correctement
     const commandData = commandModule.data ?? commandModule.default?.data;
     const commandExecute =
       commandModule.execute ?? commandModule.default?.execute;
 
-    if (!commandData || !commandData.name || commanData.name === "maxtestdaily") continue;
+    if (!commandData || !commandData.name) continue;
 
-    // Stocke dans la collection : { data, execute }
+    // Enregistre la commande dans le client
     client.commands.set(commandData.name, {
       data: commandData,
       execute: commandExecute,
     });
 
-    // Pour le déploiement, on a besoin uniquement de data
+    // Récupère les options pour affichage
+    let optionList = "";
+    try {
+      const raw =
+        commandData instanceof SlashCommandBuilder
+          ? commandData.toJSON()
+          : commandData;
+      const options = raw.options?.map((opt: any) => opt.name);
+      if (options?.length) optionList = ` (${options.join(", ")})`;
+    } catch {
+      optionList = "";
+    }
+
+    console.log(`📦 Commande chargée : /${commandData.name}${optionList}`);
+
+    // Pour le déploiement
     if (typeof commandData.toJSON === "function") {
       commands.push(commandData.toJSON());
     } else {
@@ -37,7 +51,6 @@ export async function loadSlashCommands(client: ExtendedClient) {
   }
 
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
-
   const guildIds =
     process.env.GUILD_IDS?.split(",").map((id) => id.trim()) || [];
 
@@ -55,7 +68,7 @@ export async function loadSlashCommands(client: ExtendedClient) {
         Routes.applicationGuildCommands(process.env.CLIENT_ID!, guildId),
         { body: commands }
       );
-      console.log(`✅ Commandes slash déployées sur le serveur ${guildId}`);
+      console.log(`✅ Commandes déployées sur le serveur ${guildId}`);
     }
     console.log("🎉 Déploiement terminé sur tous les serveurs !");
   } catch (error) {

@@ -1,5 +1,4 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import { getDataPayload } from "../../utils/dataPayload";
 import { getMaxLoveCount } from "../../utils/maxLoveManager";
 
 // 🔹 Définition des rangs et paliers
