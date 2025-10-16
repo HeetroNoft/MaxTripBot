@@ -67,8 +67,16 @@ export function getCooldownRemaining(userId: string) {
   return remaining > 0 ? remaining : 0;
 }
 
-// Nouvelle fonction : stats par jour
+// 🔹 Fonction pour calculer le rang
+export async function getRank(maxLove: number): Promise<string> {
+  if (maxLove >= 1000) return "🌟 Légende"; // objectif final
+  if (maxLove >= 500) return "💎 Maître"; // avancé
+  if (maxLove >= 200) return "🥇 Expert"; // intermédiaire
+  if (maxLove >= 50) return "🥈 Apprenti"; // débutant motivé
+  return "🥉 Novice"; // début
+}
 
+// Nouvelle fonction : stats par jour
 export function getMaxLoveStatsPerDay() {
   const stats: Record<string, number> = {}; // { "2025-10-14": 5 }
 

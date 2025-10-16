@@ -5,6 +5,7 @@ import {
   getMaxLoveCount,
   canUseMaxLove,
   getCooldownRemaining,
+  getRank,
 } from "../../utils/maxLoveManager";
 
 export const data = new SlashCommandBuilder()
@@ -78,12 +79,15 @@ export async function execute({
   // 🔹 Incrémenter le compteur et mettre à jour le timestamp
   addMaxLove(userId);
   const personalCount = getMaxLoveCount(userId);
+  const rank = getRank(personalCount); // 🔹 Récupérer le rang actuel
 
   const embed = new EmbedBuilder()
     .setColor(0xff69b4)
     .setTitle("💖 MaxLove !")
     .setDescription(
-      `Un peu d’amour pour <@328795495936032768> !\n\nTu as maintenant envoyé **${personalCount}** MaxLove.`
+      `Un peu d’amour pour <@328795495936032768> !\n\n` +
+        `Tu as maintenant envoyé **${personalCount}** MaxLove.\n` +
+        `🏅 Rang actuel : **${rank}**`
     )
     .setFooter({ text: "MaxTripBot • Love pour Maxime" });
 

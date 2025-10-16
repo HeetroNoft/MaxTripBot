@@ -3,6 +3,7 @@ import {
   getMaxLoveCount,
   getMaxLoveLeaderboard,
   getMaxLoveStatsPerDay,
+  getRank,
 } from "../../utils/maxLoveManager";
 import { getDataPayload } from "../../utils/dataPayload";
 import { DateTime } from "luxon";
@@ -53,8 +54,10 @@ export async function execute({
         ? sorted
             .slice(0, 5)
             .map(
-              ([user, score], i) =>
-                `**${i + 1}.** <@${user}> — ${score} ${hearts[i] ?? "❤️"}`
+              async ([user, score], i) =>
+                `**${i + 1}.** <@${user}> **(${await getRank(
+                  score
+                )}) — ${score} ${hearts[i] ?? "❤️"}`
             )
             .join("\n")
         : "Aucun MaxLove pour le moment 😢";
