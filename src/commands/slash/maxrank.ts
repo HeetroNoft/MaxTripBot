@@ -3,17 +3,18 @@ import { getDataPayload } from "../../utils/dataPayload";
 import { getMaxLoveCount } from "../../utils/maxLoveManager";
 
 // 🔹 Définition des rangs et paliers
-const RANKS: { minLove: number; name: string; emoji: string }[] = [
-  { minLove: 0, name: "Novice", emoji: "🌱" },
-  { minLove: 50, name: "Cuivre", emoji: "🟠" },
-  { minLove: 100, name: "Bronze", emoji: "🥉" },
-  { minLove: 250, name: "Silver", emoji: "🥈" },
-  { minLove: 500, name: "Gold", emoji: "🥇" },
-  { minLove: 800, name: "Platine", emoji: "🔷" },
-  { minLove: 1200, name: "Émeraude", emoji: "💚" },
-  { minLove: 2000, name: "Diamant", emoji: "💎" },
-  { minLove: 3000, name: "Légende", emoji: "🌟" },
-];
+const RANKS: { minLove: number; name: string; emoji: string; color: number }[] =
+  [
+    { minLove: 0, name: "Novice", emoji: "🌱", color: 0x808080 },
+    { minLove: 50, name: "Cuivre", emoji: "🟠", color: 0x8a4000 },
+    { minLove: 100, name: "Bronze", emoji: "🥉", color: 0x8a5700 },
+    { minLove: 250, name: "Silver", emoji: "🥈", color: 0xebebeb },
+    { minLove: 500, name: "Gold", emoji: "🥇", color: 0xffb700 },
+    { minLove: 800, name: "Platine", emoji: "🔷", color: 0x006acf },
+    { minLove: 1200, name: "Émeraude", emoji: "💚", color: 0x48c849 },
+    { minLove: 2000, name: "Diamant", emoji: "💎", color: 0x2bdcff },
+    { minLove: 3000, name: "Légende", emoji: "🌟", color: 0xea00ff },
+  ];
 
 export const data = new SlashCommandBuilder()
   .setName("maxrank")
@@ -55,10 +56,11 @@ export async function execute({
       nextRank?.minLove && nextRank.minLove > maxLove
         ? nextRank.minLove - maxLove
         : 0;
+    const colorUserRank = currentRank.color || 0xff69b4;
 
     const embed = new EmbedBuilder()
       .setTitle(`🏅 Rang de ${targetUser.username}`)
-      .setColor(0xff69b4)
+      .setColor(colorUserRank)
       .setDescription(
         nextRank
           ? `${currentRank.emoji} **${currentRank.name}** - ${maxLove} MaxLove\n\n➡️ Encore **${missing}** MaxLove pour atteindre ${nextRank.emoji} **${nextRank.name}**`
