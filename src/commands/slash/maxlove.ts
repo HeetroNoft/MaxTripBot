@@ -28,7 +28,7 @@ export async function execute({
 
   const MaxUserId = "328795495936032768";
 
-  if (interaction.user.id == MaxUserId) {
+  if (interaction?.user?.id === MaxUserId) {
     return interaction.reply({
       content: "Ah ouai tu t'aimes toi même hein ?! 😤",
     });
@@ -79,14 +79,16 @@ export async function execute({
   // 🔹 Incrémenter le compteur et mettre à jour le timestamp
   addMaxLove(userId);
   const personalCount = getMaxLoveCount(userId);
-  const rank = getRank(personalCount, true); // 🔹 Récupérer le rang actuel
+
+  // ✅ On attend la promesse ici !
+  const rank = await getRank(personalCount);
 
   const embed = new EmbedBuilder()
     .setColor(0xff69b4)
     .setTitle("💖 MaxLove !")
     .setDescription(
-      `Un peu d’amour pour <@328795495936032768> !\n\n` +
-        `<@${userId}> **(${rank})** as maintenant envoyé **${personalCount}** MaxLove.`
+      `Un peu d’amour pour <@${MaxUserId}> !\n\n` +
+        `**<@${userId}>** (${rank}) a maintenant envoyé **${personalCount}** MaxLove.`
     )
     .setFooter({ text: "MaxTripBot • Love pour Maxime" });
 
