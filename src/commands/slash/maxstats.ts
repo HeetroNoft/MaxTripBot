@@ -24,7 +24,7 @@ export async function execute({
   client: any;
 }) {
   try {
-    if (interaction) await interaction.deferReply(); // <-- Important !
+    if (interaction) await interaction.deferReply();
 
     // Récupérer les données
     const totalDistanceRaw = await getDataPayload<number>("total_km");
@@ -49,18 +49,18 @@ export async function execute({
 
     const sorted = [...leaderboard].sort((a, b) => b[1] - a[1]);
     const hearts = ["💗", "💖", "💘", "💞", "💕"];
-    const topMaxLove =
-      sorted.length > 0
-        ? sorted
-            .slice(0, 5)
-            .map(
-              async ([user, score], i) =>
-                `**${i + 1}.** <@${user}> **(${await getRank(
-                  score
-                )}) — ${score} ${hearts[i] ?? "❤️"}`
-            )
-            .join("\n")
-        : "Aucun MaxLove pour le moment 😢";
+
+    let topMaxLove = "Aucun MaxLove pour le moment 😢";
+    if (sorted.length > 0) {
+      // 🔹 résoudre les async avec Promise.all
+      const topPromises = sorted.slice(0, 5).map(async ([user, score], i) => {
+        const rank = await getRank(score); // si getRank est async
+        return `**${i + 1}.** <@${user}> **(${rank}) — ${score} ${
+          hearts[i] ?? "❤️"
+        }**`;
+      });
+      topMaxLove = (await Promise.all(topPromises)).join("\n");
+    }
 
     const statsPerDay = getMaxLoveStatsPerDay();
     let maxDayText = "Aucun MaxLove envoyé";
@@ -94,7 +94,6 @@ export async function execute({
     console.error("Erreur lors de la récupération des MaxStats :", error);
     const errorText = "❌ Impossible de récupérer les statistiques.";
 
-    // Vérifier si interaction a déjà été différée
     if (interaction) {
       if (interaction.deferred || interaction.replied) {
         await interaction.editReply(errorText);
