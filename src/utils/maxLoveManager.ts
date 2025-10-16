@@ -67,20 +67,43 @@ export function getCooldownRemaining(userId: string) {
   return remaining > 0 ? remaining : 0;
 }
 
-// 🔹 Fonction pour calculer le rang
 export async function getRank(
   maxLove: number,
-  evolved: boolean
+  evolved: boolean = false
 ): Promise<string> {
-  if (maxLove === 1000 && evolved) return "💎 Maître ➔ 🌟 Légende";
-  if (maxLove >= 1000) return "🌟 Légende"; // objectif final
-  if (maxLove === 500 && evolved) return "🥇 Expert ➔ 💎 Maître";
-  if (maxLove >= 500) return "💎 Maître"; // avancé
-  if (maxLove === 200 && evolved) return "🥈 Apprenti ➔ 🥇 Expert";
-  if (maxLove >= 200) return "🥇 Expert"; // intermédiaire
-  if (maxLove === 50 && evolved) return "🥉 Novice ➔ 🥈 Apprenti";
-  if (maxLove >= 50) return "🥈 Apprenti"; // débutant motivé
-  return "🥉 Novice"; // début
+  // 🔹 Paliers progressifs vers Légende (~3000 Max Love)
+  const RANKS: { minLove: number; name: string; emoji: string }[] = [
+    { minLove: 0, name: "Novice", emoji: "🌱" },
+    { minLove: 50, name: "Cuivre", emoji: "🟠" },
+    { minLove: 100, name: "Bronze", emoji: "🥉" },
+    { minLove: 250, name: "Silver", emoji: "🥈" },
+    { minLove: 500, name: "Gold", emoji: "🥇" },
+    { minLove: 800, name: "Platine", emoji: "🔷" },
+    { minLove: 1200, name: "Émeraude", emoji: "💚" },
+    { minLove: 2000, name: "Diamant", emoji: "💎" },
+    { minLove: 3000, name: "Légende", emoji: "🌟" },
+  ];
+
+  let currentRank = RANKS[0];
+
+  for (let i = 0; i < RANKS.length; i++) {
+    if (maxLove >= RANKS[i].minLove) {
+      currentRank = RANKS[i];
+    } else {
+      break;
+    }
+  }
+
+  // 🔹 Si evolved et maxLove correspond exactement à un palier
+  if (evolved) {
+    const nextRankIndex = RANKS.findIndex((r) => r.minLove > maxLove);
+    if (nextRankIndex > 0 && maxLove === RANKS[nextRankIndex - 1].minLove) {
+      const nextRank = RANKS[nextRankIndex];
+      return `${currentRank.emoji} ${currentRank.name} ➔ ${nextRank.emoji} ${nextRank.name}`;
+    }
+  }
+
+  return `${currentRank.emoji} ${currentRank.name}`;
 }
 
 // Nouvelle fonction : stats par jour
