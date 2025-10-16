@@ -36,7 +36,14 @@ function setDailyMaximeMessage(client: Client) {
   console.log("⏰ Message quotidien planifié à 6h (heure de Perth)");
 }
 
-function checkNewStepInPayload(client: Client) {
+async function checkNewStepInPayload(client: Client) {
+  const PAYLOAD_FILE = path.resolve("./data/payload.json");
+  const localPayload = await fs.readJson(PAYLOAD_FILE);
+  const latestStep = (localPayload.steps || []).sort(
+    (a: any, b: any) =>
+      new Date(b.start_time || b.creation_time).getTime() -
+      new Date(a.start_time || a.creation_time).getTime()
+  )[0];
   cron.schedule("10 * * * *", async () => {
     console.log("🕗 [CRON] Exécution de la mise à jour du payload...");
     const PAYLOAD_FILE = path.resolve("./data/payload.json");
@@ -64,4 +71,7 @@ function checkNewStepInPayload(client: Client) {
     newStepMessage(client);
     return undefined;
   });
+  console.log(
+    "⏰ Vérification des nouvelles étapes planifiée toutes les 10 minutes"
+  );
 }
