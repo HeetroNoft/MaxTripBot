@@ -89,8 +89,7 @@ export async function getDataPayload<T = unknown>(
       )[0];
 
       // Récupérer les coordonnées depuis la dernière step via getDataPayload
-      const lastStepTime =
-        latestStep.start_time || latestStep.creation_time || null;
+      const lastStepLocality = latestStep.location.locality || null;
       const zeldaSteps = (await payload.zelda_steps) || [];
 
       let latestZelda: any = null;
@@ -99,10 +98,17 @@ export async function getDataPayload<T = unknown>(
           .map((z: any) => ({ ...z, dt: DateTime.fromISO(z.time) }))
           .sort((a: any, b: any) => b.dt.toMillis() - a.dt.toMillis())[0];
 
-        if (lastStepTime) {
-          const lastStepDt = DateTime.fromISO(lastStepTime);
-          if (latestZelda.dt > lastStepDt) useZelda = true;
-        } else useZelda = true;
+        const latestZeldaLocality = latestZelda.location.locality || null;
+
+        if (lastStepLocality === latestZeldaLocality) {
+          useZelda = false;
+          console.log("Utilisation du last step pour les données");
+        } else {
+          useZelda = true;
+          console.warn(
+            "lastStepLocality !== latestZeldaLocality, utilisation de Zelda"
+          );
+        }
       }
       if (!latestStep) {
         console.error("Aucune step trouvée.");

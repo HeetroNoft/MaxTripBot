@@ -24,12 +24,10 @@ export async function execute({ interaction }: any) {
 
   try {
     let location =
-      (await getDataPayload("location.full_detail", true)) ||
       `${await getDataPayload(
         "location.locality",
         true
-      )}, ${await getDataPayload("location.country", true)}` ||
-      "Lieu inconnu";
+      )}, ${await getDataPayload("location.country", true)}` || "Lieu inconnu";
     let lat = (await getDataPayload("location.lat", true)) ?? -31.57;
     let lon = (await getDataPayload("location.lon", true)) ?? 115.52;
 
