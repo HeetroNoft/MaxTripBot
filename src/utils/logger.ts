@@ -20,7 +20,7 @@ export async function loadSlashCommands(client: ExtendedClient) {
     const commandExecute =
       commandModule.execute ?? commandModule.default?.execute;
 
-    if (!commandData || !commandData.name) continue;
+    if (!commandData || !commandData.name || commanData.name === "maxtestdaily") continue;
 
     // Stocke dans la collection : { data, execute }
     client.commands.set(commandData.name, {
