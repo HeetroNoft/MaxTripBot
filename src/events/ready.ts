@@ -37,7 +37,7 @@ function setDailyMaximeMessage(client: Client) {
 }
 
 async function checkNewStepInPayload(client: Client) {
-  const PAYLOAD_FILE = path.resolve("../../data/payload.json");
+  const PAYLOAD_FILE = path.resolve("./data/payload.json");
   const localPayload = await fs.readJson(PAYLOAD_FILE);
   const latestStep = (localPayload.steps || []).sort(
     (a: any, b: any) =>
@@ -51,24 +51,25 @@ async function checkNewStepInPayload(client: Client) {
   );
   cron.schedule("10 * * * *", async () => {
     console.log("🕗 [CRON] Exécution de la mise à jour du payload...");
-    const PAYLOAD_FILE = path.resolve("../../data/payload.json");
+    const PAYLOAD_FILE = path.resolve("./data/payload.json");
     const localPayload = await fs.readJson(PAYLOAD_FILE);
     const latestStep = (localPayload.steps || []).sort(
       (a: any, b: any) =>
         new Date(b.start_time || b.creation_time).getTime() -
         new Date(a.start_time || a.creation_time).getTime()
     )[0];
-    const updatedPayload = await updatePayload();
-    if (!updatedPayload) {
+    const newPayload = await updatePayload();
+    if (!newPayload) {
       console.error("❌ Échec de la mise à jour du payload.");
       return undefined;
     }
-    const newPayload = await fs.readJson(updatedPayload);
+
     const newLatestStep = (newPayload.steps || []).sort(
       (a: any, b: any) =>
         new Date(b.start_time || b.creation_time).getTime() -
         new Date(a.start_time || a.creation_time).getTime()
     )[0];
+
     if (latestStep && newLatestStep && latestStep.id === newLatestStep.id) {
       return undefined;
     }
