@@ -55,7 +55,7 @@ export async function execute({
       // 🔹 résoudre les async avec Promise.all
       const topPromises = sorted.slice(0, 5).map(async ([user, score], i) => {
         const rank = await getRank(score); // si getRank est async
-        return `**${i + 1}.** <@${user}> **(${rank}) — ${score} ${
+        return `**${i + 1}. <@${user}>** (${rank}) **— ${score} ${
           hearts[i] ?? "❤️"
         }**`;
       });
