@@ -1,10 +1,9 @@
 import type { Client } from "discord.js";
 import cron from "node-cron";
 import { dailyMaximeMessage } from "../utils/dailyMessage";
-import { updatePayload } from "../utils/dataPayload";
-import path from "path";
-import fs from "fs-extra";
+import { getDataPayload } from "../utils/dataPayload";
 import { newStepMessage } from "../utils/newStepMessage";
+import { newMediaMessage } from "../utils/newMediaMessage";
 
 export function registerEvents(client: Client) {
   client.once("clientReady", () => {
@@ -12,6 +11,7 @@ export function registerEvents(client: Client) {
 
     setDailyMaximeMessage(client);
     checkNewStepInPayload(client);
+    checkNewMediaInStep(client);
   });
 }
 
@@ -37,47 +37,70 @@ function setDailyMaximeMessage(client: Client) {
 }
 
 async function checkNewStepInPayload(client: Client) {
-  const PAYLOAD_FILE = path.resolve("./data/payload.json");
-  const localPayload = await fs.readJson(PAYLOAD_FILE);
-  const latestStep = (localPayload.steps || []).sort(
-    (a: any, b: any) =>
-      new Date(b.start_time || b.creation_time).getTime() -
-      new Date(a.start_time || a.creation_time).getTime()
-  )[0];
+  const latestStepId = await getDataPayload<any>("id", true, false);
+  const latestStepCountry = await getDataPayload<any>(
+    "location.country",
+    true,
+    false
+  );
+  const latestStepLocality = await getDataPayload<any>(
+    "location.locality",
+    true,
+    false
+  );
   console.log(
     "🚀 Step actuelle :",
-    latestStep.id,
-    `${latestStep.location.country}, ${latestStep.location.locality}`
+    latestStepId,
+    `${latestStepCountry}, ${latestStepLocality}`
   );
   cron.schedule("10 * * * *", async () => {
     console.log("🕗 [CRON] Exécution de la mise à jour du payload...");
-    const PAYLOAD_FILE = path.resolve("./data/payload.json");
-    const localPayload = await fs.readJson(PAYLOAD_FILE);
-    const latestStep = (localPayload.steps || []).sort(
-      (a: any, b: any) =>
-        new Date(b.start_time || b.creation_time).getTime() -
-        new Date(a.start_time || a.creation_time).getTime()
-    )[0];
-    const newPayload = await updatePayload();
-    if (!newPayload) {
-      console.error("❌ Échec de la mise à jour du payload.");
+    const latestStepId = await getDataPayload<any>("id", true, false);
+    const newLatestStepId = await getDataPayload<any>("id", true);
+    if (latestStepId && newLatestStepId && latestStepId === newLatestStepId) {
+      return undefined;
+    } else {
+      console.log("🚀 Nouvelle step détectée !");
+      newStepMessage(client);
       return undefined;
     }
-
-    const newLatestStep = (newPayload.steps || []).sort(
-      (a: any, b: any) =>
-        new Date(b.start_time || b.creation_time).getTime() -
-        new Date(a.start_time || a.creation_time).getTime()
-    )[0];
-
-    if (latestStep && newLatestStep && latestStep.id === newLatestStep.id) {
-      return undefined;
-    }
-    console.log("🚀 Nouvelle step détectée !");
-    newStepMessage(client);
-    return undefined;
   });
   console.log(
     "⏰ Vérification des nouvelles étapes planifiée toutes les 10 minutes"
+  );
+}
+
+async function checkNewMediaInStep(client: Client) {
+  const latestStep = await getDataPayload<any>("id", true, false);
+  const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
+  const latestMedia =
+    mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
+  console.log(
+    "🖼️ Media actuelle :",
+    latestStep,
+    latestMedia?.id,
+    latestMedia?.path
+  );
+
+  cron.schedule("10 * * * *", async () => {
+    console.log("🕗 [CRON] Exécution de la mise à jour de la dernière image");
+    const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
+    const latestMedia =
+      mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
+
+    const newMediaArray =
+      (await getDataPayload<any>("media", true, false)) || [];
+    const newLatestMedia =
+      newMediaArray.length > 0 ? newMediaArray[newMediaArray.length - 1] : null;
+
+    if (latestMedia && newLatestMedia && latestMedia.id === newLatestMedia.id) {
+      return undefined;
+    }
+    console.log("🖼️ Nouvelle image détectée !");
+    newMediaMessage(client);
+    return undefined;
+  });
+  console.log(
+    "⏰ Vérification des nouvelles images planifiée toutes les 10 minutes"
   );
 }

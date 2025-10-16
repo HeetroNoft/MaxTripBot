@@ -27,7 +27,6 @@ export async function updatePayload(): Promise<any | undefined> {
       throw new Error(`❌ URL TRIP_URL invalide ou manquante: "${tripUrl}"`);
     }
 
-    console.log(`Chargement du payload via Puppeteer (${tripUrl})...`);
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -43,7 +42,6 @@ export async function updatePayload(): Promise<any | undefined> {
         const text = await resp.text();
         if (text.includes('"steps"') || text.includes('"trip"')) {
           payloads.push(JSON.parse(text));
-          console.log("✅ Payload JSON intercepté via Puppeteer.");
         }
       } catch (err) {
         console.warn("Erreur interception JSON:", err);
@@ -80,13 +78,16 @@ export async function updatePayload(): Promise<any | undefined> {
  * Récupère une clé spécifique depuis le payload.
  * @param dataPath Chemin dans le payload, ex: "location.full_detail"
  * @param latestOnly Si true, ne considère que la dernière step
+ * @param refresh Si true, recharge le payload avant de récupérer les données
  */
 export async function getDataPayload<T = unknown>(
   dataPath: string,
-  latestOnly = false
+  latestOnly = false,
+  refresh = true
 ): Promise<T | undefined> {
   try {
-    const payload = await updatePayload();
+    let payload = await fs.readJson(PAYLOAD_FILE);
+    if (refresh) payload = await updatePayload();
     if (!payload) return undefined;
 
     let useZelda = false;
@@ -113,7 +114,6 @@ export async function getDataPayload<T = unknown>(
 
         if (lastStepLocality === latestZeldaLocality) {
           useZelda = false;
-          console.log("Utilisation du last step pour les données");
         } else {
           useZelda = true;
           console.warn(
