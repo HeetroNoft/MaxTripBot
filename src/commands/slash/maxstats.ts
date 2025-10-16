@@ -2,7 +2,7 @@ import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import {
   getMaxLoveCount,
   getMaxLoveLeaderboard,
-  getMaxLoveStatsPerDay, // <-- ajouter l'import
+  getMaxLoveStatsPerDay,
 } from "../../utils/maxLoveManager";
 import { getDataPayload } from "../../utils/dataPayload";
 import { DateTime } from "luxon";
@@ -23,12 +23,13 @@ export async function execute({
   client: any;
 }) {
   try {
-    // Récupérer la distance totale via getDataPayload
+    if (interaction) await interaction.deferReply(); // <-- Important !
+
+    // Récupérer les données
     const totalDistanceRaw = await getDataPayload<number>("total_km");
     const totalDistance = totalDistanceRaw?.toFixed(1) || "Distance inconnue";
 
     const totalCountries = await getDataPayload<number>("nb_country");
-
     const totalSteps = await getDataPayload<number>("nb_steps");
     const allFlags = await getDataPayload<string[]>("flag_countries");
 
@@ -38,19 +39,15 @@ export async function execute({
     const departDate = DateTime.fromISO(departISO, {
       zone: "Europe/Paris",
     }).startOf("day");
+
     let diffDays = Math.floor(today.diff(departDate, "days").days) + " jours";
     if (diffDays === "0 jours") diffDays = "Aujourd'hui";
 
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
 
-    // Trier les utilisateurs par score décroissant
     const sorted = [...leaderboard].sort((a, b) => b[1] - a[1]);
-
-    // Différents cœurs pour les 3 premiers
     const hearts = ["💗", "💖", "💘", "💞", "💕"];
-
-    // Créer un top 5 formaté
     const topMaxLove =
       sorted.length > 0
         ? sorted
@@ -62,18 +59,15 @@ export async function execute({
             .join("\n")
         : "Aucun MaxLove pour le moment 😢";
 
-    // --- NOUVEAU : stats par jour ---
     const statsPerDay = getMaxLoveStatsPerDay();
     let maxDayText = "Aucun MaxLove envoyé";
     if (Object.keys(statsPerDay).length > 0) {
       const maxEntry = Object.entries(statsPerDay).reduce((a, b) =>
         b[1] > a[1] ? b : a
       );
-
       const day = DateTime.fromISO(maxEntry[0])
         .setLocale("fr")
         .toLocaleString(DateTime.DATE_FULL);
-
       maxDayText = `${day} (${maxEntry[1]} MaxLoves)`;
     }
 
@@ -91,13 +85,21 @@ export async function execute({
       )
       .setFooter({ text: "MaxTripBot • Stats" });
 
-    if (interaction) await interaction.reply({ embeds: [embed] });
+    if (interaction) await interaction.editReply({ embeds: [embed] });
     else if (message) await message.reply({ embeds: [embed] });
   } catch (error) {
     console.error("Erreur lors de la récupération des MaxStats :", error);
-    if (interaction)
-      await interaction.reply("❌ Impossible de récupérer les statistiques.");
-    else if (message)
-      await message.reply("❌ Impossible de récupérer les statistiques.");
+    const errorText = "❌ Impossible de récupérer les statistiques.";
+
+    // Vérifier si interaction a déjà été différée
+    if (interaction) {
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply(errorText);
+      } else {
+        await interaction.reply(errorText);
+      }
+    } else if (message) {
+      await message.reply(errorText);
+    }
   }
 }
