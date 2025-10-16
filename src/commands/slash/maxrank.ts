@@ -61,8 +61,8 @@ export async function execute({
       .setColor(0xff69b4)
       .setDescription(
         nextRank
-          ? `${currentRank.emoji} **${currentRank.name}**\n${maxLove} MaxLove\n➡️ Encore **${missing}** MaxLove pour atteindre ${nextRank.emoji} **${nextRank.name}**`
-          : `${currentRank.emoji} **${currentRank.name}**\n${maxLove} MaxLove\n🌟 Tu as atteint le rang **Légende**, félicitations !`
+          ? `${currentRank.emoji} **${currentRank.name}** - ${maxLove} MaxLove\n\n➡️ Encore **${missing}** MaxLove pour atteindre ${nextRank.emoji} **${nextRank.name}**`
+          : `${currentRank.emoji} **${currentRank.name}** - ${maxLove} MaxLove\n\n🌟 Tu as atteint le rang **Légende**, félicitations !`
       )
       .setThumbnail(targetUser.displayAvatarURL())
       .setFooter({ text: "MaxTripBot • Progression personnelle" });
