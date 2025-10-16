@@ -44,6 +44,11 @@ async function checkNewStepInPayload(client: Client) {
       new Date(b.start_time || b.creation_time).getTime() -
       new Date(a.start_time || a.creation_time).getTime()
   )[0];
+  console.log(
+    "Step actuelle :",
+    latestStep.id,
+    `${latestStep.location.country}, ${latestStep.location.locality}`
+  );
   cron.schedule("10 * * * *", async () => {
     console.log("🕗 [CRON] Exécution de la mise à jour du payload...");
     const PAYLOAD_FILE = path.resolve("./data/payload.json");
