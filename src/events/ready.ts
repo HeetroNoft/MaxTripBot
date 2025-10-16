@@ -37,7 +37,7 @@ function setDailyMaximeMessage(client: Client) {
 }
 
 async function checkNewStepInPayload(client: Client) {
-  const PAYLOAD_FILE = path.resolve("./data/payload.json");
+  const PAYLOAD_FILE = path.resolve("../../data/payload.json");
   const localPayload = await fs.readJson(PAYLOAD_FILE);
   const latestStep = (localPayload.steps || []).sort(
     (a: any, b: any) =>
@@ -51,7 +51,7 @@ async function checkNewStepInPayload(client: Client) {
   );
   cron.schedule("10 * * * *", async () => {
     console.log("🕗 [CRON] Exécution de la mise à jour du payload...");
-    const PAYLOAD_FILE = path.resolve("./data/payload.json");
+    const PAYLOAD_FILE = path.resolve("../../data/payload.json");
     const localPayload = await fs.readJson(PAYLOAD_FILE);
     const latestStep = (localPayload.steps || []).sort(
       (a: any, b: any) =>
