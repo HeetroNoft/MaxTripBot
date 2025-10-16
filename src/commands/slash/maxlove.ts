@@ -86,8 +86,7 @@ export async function execute({
     .setTitle("💖 MaxLove !")
     .setDescription(
       `Un peu d’amour pour <@328795495936032768> !\n\n` +
-        `Tu as maintenant envoyé **${personalCount}** MaxLove.\n` +
-        `🏅 Rang actuel : **${rank}**`
+        `<@${userId}> **(${rank})** as maintenant envoyé **${personalCount}** MaxLove.`
     )
     .setFooter({ text: "MaxTripBot • Love pour Maxime" });
 
