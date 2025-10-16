@@ -68,10 +68,17 @@ export function getCooldownRemaining(userId: string) {
 }
 
 // 🔹 Fonction pour calculer le rang
-export async function getRank(maxLove: number): Promise<string> {
+export async function getRank(
+  maxLove: number,
+  evolved: boolean
+): Promise<string> {
+  if (maxLove === 1000 && evolved) return "💎 Maître ➔ 🌟 Légende";
   if (maxLove >= 1000) return "🌟 Légende"; // objectif final
+  if (maxLove === 500 && evolved) return "🥇 Expert ➔ 💎 Maître";
   if (maxLove >= 500) return "💎 Maître"; // avancé
+  if (maxLove === 200 && evolved) return "🥈 Apprenti ➔ 🥇 Expert";
   if (maxLove >= 200) return "🥇 Expert"; // intermédiaire
+  if (maxLove === 50 && evolved) return "🥉 Novice ➔ 🥈 Apprenti";
   if (maxLove >= 50) return "🥈 Apprenti"; // débutant motivé
   return "🥉 Novice"; // début
 }

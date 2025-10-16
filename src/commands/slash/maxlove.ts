@@ -79,7 +79,7 @@ export async function execute({
   // 🔹 Incrémenter le compteur et mettre à jour le timestamp
   addMaxLove(userId);
   const personalCount = getMaxLoveCount(userId);
-  const rank = getRank(personalCount); // 🔹 Récupérer le rang actuel
+  const rank = getRank(personalCount, true); // 🔹 Récupérer le rang actuel
 
   const embed = new EmbedBuilder()
     .setColor(0xff69b4)
