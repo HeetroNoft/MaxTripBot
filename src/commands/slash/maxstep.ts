@@ -16,9 +16,10 @@ export async function execute({ interaction }: any) {
   // Récupère la dernière step
 
   const place =
-    (await getDataPayload<string>("location.full_detail", true)) ||
-    (await getDataPayload<string>("location.country", true)) ||
-    "Lieu inconnu";
+    `${await getDataPayload("location.locality", true)}, ${await getDataPayload(
+      "location.country",
+      true
+    )}` || "Lieu inconnu";
   const dateISO =
     (await getDataPayload<string>("start_time", true)) ||
     (await getDataPayload<string>("creation_time", true)) ||
