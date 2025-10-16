@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { getDataPayload } from "../../utils/dataPayload";
+import { getMaxLoveCount } from "../../utils/maxLoveManager";
 
 // 🔹 Définition des rangs et paliers
 const RANKS: { minLove: number; name: string; emoji: string }[] = [
@@ -39,10 +40,7 @@ export async function execute({
   // Si un utilisateur est précisé → afficher son rang individuel
   if (userOption) {
     // ✅ Récupère le nombre de MaxLove du user (et force le typage en nombre)
-    const loveData = await getDataPayload<number | null>(
-      `users.${targetUser.id}.maxlove`,
-      true
-    );
+    const loveData = getMaxLoveCount(userOption.id);
     const maxLove = typeof loveData === "number" ? loveData : 0;
 
     // ✅ Trouver le rang actuel
