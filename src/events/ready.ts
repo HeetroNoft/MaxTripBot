@@ -45,7 +45,7 @@ async function checkNewStepInPayload(client: Client) {
       new Date(a.start_time || a.creation_time).getTime()
   )[0];
   console.log(
-    "Step actuelle :",
+    "🚀 Step actuelle :",
     latestStep.id,
     `${latestStep.location.country}, ${latestStep.location.locality}`
   );

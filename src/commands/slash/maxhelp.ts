@@ -30,8 +30,15 @@ export async function execute({
   for (const file of commandFiles) {
     const command = await import(path.join(commandsDir, file));
     const name = command.data?.name || "unknown";
+    const options = command.data?.options;
     const description = command.data?.description || "Pas de description";
-    embed.addFields({ name: `/${name}`, value: description, inline: false });
+    embed.addFields({
+      name: `/${name}${
+        options ? ` - (${options.map((o: any) => o.name).join(", ")})` : ""
+      }`,
+      value: description,
+      inline: false,
+    });
   }
 
   embed.setFooter({
