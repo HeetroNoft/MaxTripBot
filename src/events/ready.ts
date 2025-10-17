@@ -2,8 +2,7 @@ import type { Client } from "discord.js";
 import cron from "node-cron";
 import { dailyMaximeMessage } from "../utils/dailyMessage";
 import { getDataPayload } from "../utils/dataPayload";
-import { newStepMessage } from "../utils/newStepMessage";
-import { newMediaMessage } from "../utils/newMediaMessage";
+import { newPayloadMessage } from "../utils/newPayloadMessage";
 
 export function registerEvents(client: Client) {
   client.once("clientReady", () => {
@@ -13,7 +12,6 @@ export function registerEvents(client: Client) {
 
     setDailyMaximeMessage(client);
     checkNewStepInPayload(client);
-    checkNewMediaInStep(client);
   });
 }
 
@@ -40,74 +38,47 @@ function setDailyMaximeMessage(client: Client) {
 }
 
 async function checkNewStepInPayload(client: Client) {
-  const latestStepId = await getDataPayload<any>("id", true, false);
-  const latestStepCountry = await getDataPayload<any>(
-    "location.country",
-    true,
-    false
-  );
-  const latestStepLocality = await getDataPayload<any>(
-    "location.locality",
-    true,
-    false
-  );
-  console.log(
-    "🚀 Step actuelle :",
-    latestStepId,
-    `${latestStepCountry}, ${latestStepLocality}`
-  );
   cron.schedule("*/10 * * * *", async () => {
     const now = new Date().toLocaleString("fr-FR");
     console.log(`🕗 [${now}] [CRON] Exécution de la mise à jour du payload...`);
+
+    // 🔍 Vérifier les nouvelles étapes ou médias
     const latestStepId = await getDataPayload<any>("id", true, false);
+    const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
+    const latestMedia =
+      mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
+
     const newLatestStepId = await getDataPayload<any>("id", true);
-    if (latestStepId && newLatestStepId && latestStepId === newLatestStepId) {
+    const newMediaArray = (await getDataPayload<any>("media", true)) || [];
+    const newLatestMedia =
+      newMediaArray.length > 0 ? newMediaArray[newMediaArray.length - 1] : null;
+
+    // Pas de nouvelle étape
+    if (!latestStepId || !newLatestStepId) {
+      console.error("⚠️ Impossible de récupérer les étapes.");
       return undefined;
+    }
+
+    // Même étape, vérifier les médias
+    if (latestStepId && newLatestStepId && latestStepId === newLatestStepId) {
+      // Même média, rien à faire
+      if (
+        latestMedia &&
+        newLatestMedia &&
+        latestMedia.id === newLatestMedia.id
+      ) {
+        return undefined;
+      } else {
+        console.log("🖼️ Nouvelle image détectée !");
+        newPayloadMessage(client, true);
+      }
     } else {
       console.log("🚀 Nouvelle step détectée !");
-      newStepMessage(client);
+      newPayloadMessage(client);
       return undefined;
     }
   });
   console.log(
     "⏰ Vérification des nouvelles étapes planifiée toutes les 10 minutes"
-  );
-}
-
-async function checkNewMediaInStep(client: Client) {
-  const latestStep = await getDataPayload<any>("id", true, false);
-  const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
-  const latestMedia =
-    mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
-  console.log(
-    "🖼️ Media actuelle :",
-    latestStep,
-    latestMedia?.id,
-    latestMedia?.path
-  );
-
-  cron.schedule("*/10 * * * *", async () => {
-    const now = new Date().toLocaleString("fr-FR");
-    console.log(
-      `🕗 [${now}] [CRON] Exécution de la mise à jour de la dernière image`
-    );
-    const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
-    const latestMedia =
-      mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
-
-    const newMediaArray =
-      (await getDataPayload<any>("media", true, false)) || [];
-    const newLatestMedia =
-      newMediaArray.length > 0 ? newMediaArray[newMediaArray.length - 1] : null;
-
-    if (latestMedia && newLatestMedia && latestMedia.id === newLatestMedia.id) {
-      return undefined;
-    }
-    console.log("🖼️ Nouvelle image détectée !");
-    newMediaMessage(client);
-    return undefined;
-  });
-  console.log(
-    "⏰ Vérification des nouvelles images planifiée toutes les 10 minutes"
   );
 }

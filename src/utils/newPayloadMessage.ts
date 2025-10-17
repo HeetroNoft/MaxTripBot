@@ -1,6 +1,9 @@
 import { TextChannel, Client } from "discord.js";
 
-export async function newMediaMessage(client: Client) {
+export async function newPayloadMessage(
+  client: Client,
+  isNewMedia: boolean = false
+) {
   const channelId = process.env.DAILY_CHANNEL_ID;
 
   if (!channelId) {
@@ -16,8 +19,11 @@ export async function newMediaMessage(client: Client) {
 
   // 💬 Générer le message
   let messageText: string;
-  messageText = `🚀 **Une nouvelle image a été détectée sur le polarsteps !**\n\n*Utilise la commande **/maxstep** pour voir les dernières news de Maxime !*`;
-
+  if (isNewMedia) {
+    messageText = `🚀 **Une nouvelle image a été détectée sur le polarsteps !**\n\n*Utilise la commande **/maxstep** pour voir les dernières news de Maxime !*`;
+  } else {
+    messageText = `🚀 **Une nouvelle étape a été détectée sur le polarsteps !**\n\n*Utilise la commande **/maxstep** pour voir les dernières news de Maxime !*`;
+  }
   // 🚀 Envoi du message
   await channel.send(messageText);
 }
