@@ -38,7 +38,7 @@ export async function execute({ interaction }: any) {
   ]);
 
   const now = new Date().toLocaleString("fr-FR");
-  console.log(`📦 [${now}] Données récupérées :`, {
+  console.log(`📦 [${now}] (/maxstep) Données récupérées :`, {
     locality,
     country,
     start_time,

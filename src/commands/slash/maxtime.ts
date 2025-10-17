@@ -54,7 +54,7 @@ export async function execute({
   const diffHours = maxTime ? (maxTime.offset - franceTime.offset) / 60 : 0;
 
   const now = new Date().toLocaleString("fr-FR");
-  console.log(`📦 [${now}] Données temps :`, {
+  console.log(`📦 [${now}] (/maxtime) Données temps :`, {
     france: franceTime.toFormat("HH:mm"),
     max: maxTime?.toFormat("HH:mm") ?? "aucune donnée",
     diff: diffHours,
