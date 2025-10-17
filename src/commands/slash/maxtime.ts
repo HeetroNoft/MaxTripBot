@@ -8,15 +8,17 @@ export const data = new SlashCommandBuilder()
     "Affiche l'heure de la dernière position connue de Maxime / France et la différence"
   );
 
-export const aliases = ["maxtime ", "maxheure"];
+export const aliases = ["maxtime", "maxheure"];
 
-function countryCodeToFlagEmoji(countryCode: string): string {
-  if (!countryCode || countryCode.length !== 2) return "🏳️"; // drapeau blanc par défaut
-  // Convertir chaque lettre en "Regional Indicator Symbol"
-  const codePoints = [...countryCode.toUpperCase()].map(
-    (char) => 0x1f1e6 + char.charCodeAt(0) - 65
+function countryCodeToFlagEmoji(code: string | null): string {
+  if (!code || code.length !== 2) return "🏳️";
+  const offset = 0x1f1e6 - 65;
+  return String.fromCodePoint(
+    ...code
+      .toUpperCase()
+      .split("")
+      .map((c) => offset + c.charCodeAt(0))
   );
-  return String.fromCodePoint(...codePoints);
 }
 
 export async function execute({
@@ -26,38 +28,50 @@ export async function execute({
   interaction?: any;
   message?: any;
 }) {
-  const franceTime = DateTime.now().setZone("Europe/Paris");
-  let maxTime = null as any;
-  if (await getDataPayload("timezone_id", true)) {
-    maxTime = DateTime.now().setZone(await getDataPayload("timezone_id", true));
-  }
-  const maxLocation =
-    (await getDataPayload("location.country", true)) || "Lieu inconnu";
-  const rawSlug = await getDataPayload("slug", true);
-  const maxLocationCity =
-    typeof rawSlug === "string" && rawSlug.length > 0
-      ? rawSlug.replace(/^./, (str) => str.toUpperCase())
-      : (await getDataPayload("location.locality", true)) || null;
-  const countryCode =
-    (await getDataPayload<string>("location.country_code", true)) || "";
-  const maxCountryFlag = countryCodeToFlagEmoji(countryCode);
+  const [timezoneId, country, slug, locality, countryCode] = await Promise.all([
+    getDataPayload<string>("timezone_id", true),
+    getDataPayload<string>("location.country", true),
+    getDataPayload<string>("slug", true),
+    getDataPayload<string>("location.locality", true),
+    getDataPayload<string>("location.country_code", true),
+  ]);
 
-  // Calcul de la différence de temps en heures
-  let diffHours = 0; // convertir en heures
-  if (maxTime) {
-    diffHours = maxTime.offset - franceTime.offset; // offset en minutes
-    diffHours = diffHours / 60;
-  }
+  // Normalisation pour éviter undefined
+  const tz = timezoneId ?? null;
+  const locCountry = country ?? "Lieu inconnu";
+  const slugValue = slug ?? "";
+  const localityValue = locality ?? "";
+  const cc = countryCode ?? null;
+
+  const franceTime = DateTime.now().setZone("Europe/Paris");
+  const maxTime = tz ? DateTime.now().setZone(tz) : null;
+  const city =
+    slugValue.length > 0
+      ? slugValue.replace(/^./, (s) => s.toUpperCase())
+      : localityValue || null;
+  const flag = countryCodeToFlagEmoji(cc);
+
+  const diffHours = maxTime ? (maxTime.offset - franceTime.offset) / 60 : 0;
+
+  const now = new Date().toLocaleString("fr-FR");
+  console.log(`📦 [${now}] Données temps :`, {
+    france: franceTime.toFormat("HH:mm"),
+    max: maxTime?.toFormat("HH:mm") ?? "aucune donnée",
+    diff: diffHours,
+    flag,
+    location: locCountry,
+    city,
+  });
 
   const embed = new EmbedBuilder()
     .setColor(0x1e90ff)
     .setTitle("⏰ Heures actuelles")
     .setDescription(
       `**🇫🇷 France (Paris) :** ${franceTime.toFormat("HH:mm")}\n` +
-        `**${maxCountryFlag} ${maxLocation} ${
-          maxLocationCity ? `(${maxLocationCity})` : ""
-        } :** ${maxTime ? maxTime.toFormat("HH:mm") : "aucune donnée"}\n` +
-        `\nDifférence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
+        `**${flag} ${locCountry}${city ? ` (${city})` : ""} :** ${
+          maxTime ? maxTime.toFormat("HH:mm") : "aucune donnée"
+        }\n\n` +
+        `Différence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
     )
     .setFooter({ text: "MaxTripBot • Time Info" });
 

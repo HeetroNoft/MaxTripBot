@@ -13,9 +13,6 @@ export const aliases = ["maxloc", "maxmap"];
 export async function execute({ interaction }: any) {
   await interaction.deferReply();
 
-  const now = new Date().toLocaleString("fr-FR");
-  console.log(`🔍 [${now}] Récupération des données dans le payload`);
-
   const [
     locality,
     country,
@@ -40,7 +37,8 @@ export async function execute({ interaction }: any) {
     getDataPayload<string>("screenshot_url", true, false),
   ]);
 
-  console.log("📦 Données récupérées :", {
+  const now = new Date().toLocaleString("fr-FR");
+  console.log(`📦 [${now}] Données récupérées :`, {
     locality,
     country,
     start_time,
