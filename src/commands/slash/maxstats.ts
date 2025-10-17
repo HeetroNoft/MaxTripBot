@@ -24,7 +24,7 @@ export async function execute({
   try {
     if (interaction) await interaction.deferReply();
 
-    // Exécuter toutes les requêtes de données en parallèle
+    // Récupération parallèle des données
     const [totalDistanceRaw, totalCountries, totalSteps, allFlags] =
       await Promise.all([
         getDataPayload<number>("total_km"),
@@ -49,7 +49,7 @@ export async function execute({
     );
     const diffDays = diffDaysNum === 0 ? "Aujourd'hui" : `${diffDaysNum} jours`;
 
-    // MaxLove stats
+    // Statistiques MaxLove
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
     const statsPerDay = getMaxLoveStatsPerDay();
@@ -59,10 +59,14 @@ export async function execute({
     if (leaderboard.length > 0) {
       const sorted = [...leaderboard].sort((a, b) => b[1] - a[1]).slice(0, 5);
       const hearts = ["💗", "💖", "💘", "💞", "💕"];
+
       const entries = await Promise.all(
         sorted.map(async ([user, score], i) => {
-          const rank = await getRank(score, false);
-          return `**${i + 1}.** <@${user}> (${rank}) **— ${score} ${
+          const rankLabel = await getRank({
+            maxLove: score,
+            dataReturn: "rank",
+          });
+          return `**${i + 1}.** <@${user}> (${rankLabel}) **— ${score} ${
             hearts[i] ?? "❤️"
           }**`;
         })

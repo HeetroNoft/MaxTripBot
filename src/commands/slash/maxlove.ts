@@ -11,30 +11,27 @@ import {
 export const data = new SlashCommandBuilder()
   .setName("maxlove")
   .setDescription("Un peu d'amour pour Maxime ! (⏱ 1h)");
-
 export const aliases = ["maxlove"];
 
 export async function execute({
   interaction,
   message,
-  client,
 }: {
   interaction?: any;
   message?: any;
-  client: any;
 }) {
   const userId = interaction?.user?.id || message?.author?.id;
   if (!userId) return;
 
   const MaxUserId = "328795495936032768";
-
-  if (interaction?.user?.id === MaxUserId) {
-    return interaction.reply({
-      content: "Ah ouai tu t'aimes toi même hein ?! 😤",
-    });
+  if (userId === MaxUserId) {
+    return (
+      interaction?.reply?.({
+        content: "Ah ouai tu t'aimes toi même hein ?! 😤",
+      }) || message?.reply?.("Ah ouai tu t'aimes toi même hein ?! 😤")
+    );
   }
 
-  // 🔹 Vérifier si on est le jour du départ ou après
   const departISO = process.env.MAX_DEPART;
   if (!departISO) {
     console.error("❌ MAX_DEPART manquant dans .env");
@@ -46,42 +43,42 @@ export async function execute({
   const diffDays = today.diff(departDate, "days").days;
 
   if (diffDays < 0) {
-    const remainingDays = Math.ceil(Math.abs(diffDays));
     const embed = new EmbedBuilder()
       .setColor(0xff0059)
       .setTitle("⏳ MaxLove indisponible")
       .setDescription(
-        `Hey **<@${userId}>** ! Maxime n’est pas encore parti pour l’Australie 🇦🇺\n` +
-          `Tu pourras envoyer ton premier MaxLove dans **${remainingDays} jour(s)**.`
+        `Hey **<@${userId}>** ! Maxime n’est pas encore parti 🇦🇺\n` +
+          `Tu pourras envoyer ton premier MaxLove dans **${Math.ceil(
+            Math.abs(diffDays)
+          )} jour(s)**.`
       )
       .setFooter({ text: "MaxTripBot • Patience !" });
 
-    if (interaction) return interaction.reply({ embeds: [embed], flags: 64 });
-    else return message?.reply({ embeds: [embed] });
+    return (
+      interaction?.reply?.({ embeds: [embed], flags: 64 }) ||
+      message?.reply?.({ embeds: [embed] })
+    );
   }
 
-  // 🔹 Vérifier cooldown
   if (!canUseMaxLove(userId)) {
-    const remainingMs = getCooldownRemaining(userId);
-    const minutes = Math.ceil(remainingMs / 60000);
+    const minutes = Math.ceil(getCooldownRemaining(userId) / 60000);
     const embed = new EmbedBuilder()
       .setColor(0xff4500)
       .setTitle("⏱ MaxLove Cooldown")
       .setDescription(
-        `Hey **<@${userId}>** ! Tu dois attendre encore **${minutes} minute(s)** avant de pouvoir envoyer un MaxLove.`
+        `Hey **<@${userId}>** ! Attends encore **${minutes} minute(s)** avant de pouvoir envoyer un MaxLove.`
       )
       .setFooter({ text: "MaxTripBot • Patience !" });
 
-    if (interaction) return interaction.reply({ embeds: [embed], flags: 64 });
-    else return message?.reply({ embeds: [embed] });
+    return (
+      interaction?.reply?.({ embeds: [embed], flags: 64 }) ||
+      message?.reply?.({ embeds: [embed] })
+    );
   }
 
-  // 🔹 Incrémenter le compteur et mettre à jour le timestamp
   addMaxLove(userId);
   const personalCount = getMaxLoveCount(userId);
-
-  // ✅ On attend la promesse ici !
-  const rank = await getRank(personalCount);
+  const rank = await getRank({ maxLove: personalCount, dataReturn: "rank" });
 
   const embed = new EmbedBuilder()
     .setColor(0xff69b4)
@@ -93,5 +90,5 @@ export async function execute({
     .setFooter({ text: "MaxTripBot • Love pour Maxime" });
 
   if (interaction) await interaction.reply({ embeds: [embed] });
-  else if (message) await message.reply({ embeds: [embed] });
+  else await message?.reply({ embeds: [embed] });
 }

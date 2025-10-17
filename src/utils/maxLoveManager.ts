@@ -67,43 +67,61 @@ export function getCooldownRemaining(userId: string) {
   return remaining > 0 ? remaining : 0;
 }
 
-export async function getRank(
-  maxLove: number,
-  evolved: boolean = false
-): Promise<string> {
-  // 🔹 Paliers progressifs vers Légende (~3000 Max Love)
-  const RANKS: { minLove: number; name: string; emoji: string }[] = [
-    { minLove: 0, name: "Novice", emoji: "🌱" },
-    { minLove: 50, name: "Cuivre", emoji: "🟠" },
-    { minLove: 100, name: "Bronze", emoji: "🥉" },
-    { minLove: 250, name: "Silver", emoji: "🥈" },
-    { minLove: 500, name: "Gold", emoji: "🥇" },
-    { minLove: 800, name: "Platine", emoji: "🔷" },
-    { minLove: 1200, name: "Émeraude", emoji: "💚" },
-    { minLove: 2000, name: "Diamant", emoji: "💎" },
-    { minLove: 3000, name: "Légende", emoji: "🌟" },
+export async function getRank({
+  maxLove,
+  dataReturn,
+  evolved = false,
+}: {
+  maxLove?: number;
+  dataReturn:
+    | "color"
+    | "minLove"
+    | "name"
+    | "emoji"
+    | "rank"
+    | "nextRank"
+    | "ranks";
+  evolved?: boolean;
+}): Promise<any> {
+  const RANKS = [
+    { minLove: 0, name: "Novice", emoji: "🌱", color: 0x808080 },
+    { minLove: 50, name: "Cuivre", emoji: "🟠", color: 0x8a4000 },
+    { minLove: 100, name: "Bronze", emoji: "🥉", color: 0x8a5700 },
+    { minLove: 250, name: "Silver", emoji: "🥈", color: 0xebebeb },
+    { minLove: 500, name: "Gold", emoji: "🥇", color: 0xffb700 },
+    { minLove: 800, name: "Platine", emoji: "🔷", color: 0x006acf },
+    { minLove: 1200, name: "Émeraude", emoji: "💚", color: 0x48c849 },
+    { minLove: 2000, name: "Diamant", emoji: "💎", color: 0x2bdcff },
+    { minLove: 3000, name: "Légende", emoji: "🌟", color: 0xea00ff },
   ];
 
-  let currentRank = RANKS[0];
-
-  for (let i = 0; i < RANKS.length; i++) {
-    if (maxLove >= RANKS[i].minLove) {
-      currentRank = RANKS[i];
-    } else {
-      break;
-    }
-  }
-
-  // 🔹 Si evolved et maxLove correspond exactement à un palier
-  if (evolved) {
-    const nextRankIndex = RANKS.findIndex((r) => r.minLove > maxLove);
-    if (nextRankIndex > 0 && maxLove === RANKS[nextRankIndex - 1].minLove) {
-      const nextRank = RANKS[nextRankIndex];
+  let currentRank = null;
+  let nextRank = null;
+  if (maxLove) {
+    currentRank = RANKS.filter((r) => maxLove >= r.minLove).at(-1) ?? RANKS[0];
+    nextRank = RANKS.find((r) => r.minLove > maxLove);
+    if (evolved && nextRank && maxLove === currentRank.minLove)
       return `${currentRank.emoji} ${currentRank.name} ➔ ${nextRank.emoji} ${nextRank.name}`;
-    }
   }
 
-  return `${currentRank.emoji} ${currentRank.name}`;
+  switch (dataReturn) {
+    case "color":
+      return currentRank ? currentRank.color : undefined;
+    case "minLove":
+      return currentRank ? currentRank.minLove : undefined;
+    case "name":
+      return currentRank ? currentRank.name : undefined;
+    case "emoji":
+      return currentRank ? currentRank.emoji : undefined;
+    case "rank":
+      return currentRank
+        ? `${currentRank.emoji} ${currentRank.name}`
+        : undefined;
+    case "nextRank":
+      return nextRank;
+    case "ranks":
+      return RANKS;
+  }
 }
 
 // Nouvelle fonction : stats par jour
