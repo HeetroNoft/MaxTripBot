@@ -17,91 +17,109 @@ export const aliases = ["maxstats"];
 export async function execute({
   interaction,
   message,
-  client,
 }: {
   interaction?: any;
   message?: any;
-  client: any;
 }) {
   try {
     if (interaction) await interaction.deferReply();
 
-    // Récupérer les données
-    const totalDistanceRaw = await getDataPayload<number>("total_km");
-    const totalDistance = totalDistanceRaw?.toFixed(1) || "Distance inconnue";
+    // Exécuter toutes les requêtes de données en parallèle
+    const [totalDistanceRaw, totalCountries, totalSteps, allFlags] =
+      await Promise.all([
+        getDataPayload<number>("total_km"),
+        getDataPayload<number>("nb_country"),
+        getDataPayload<number>("nb_steps"),
+        getDataPayload<string[]>("flag_countries"),
+      ]);
 
-    const totalCountries = await getDataPayload<number>("nb_country");
-    const totalSteps = await getDataPayload<number>("nb_steps");
-    const allFlags = await getDataPayload<string[]>("flag_countries");
+    const totalDistance =
+      typeof totalDistanceRaw === "number"
+        ? `${totalDistanceRaw.toFixed(1)} km`
+        : "Distance inconnue";
 
-    const departISO = process.env.MAX_DEPART as string;
-    const nowParis = DateTime.now().setZone("Europe/Paris");
-    const today = nowParis.startOf("day");
+    const departISO = process.env.MAX_DEPART || "";
+    const nowParis = DateTime.now().setZone("Europe/Paris").startOf("day");
     const departDate = DateTime.fromISO(departISO, {
       zone: "Europe/Paris",
     }).startOf("day");
+    const diffDaysNum = Math.max(
+      0,
+      Math.floor(nowParis.diff(departDate, "days").days)
+    );
+    const diffDays = diffDaysNum === 0 ? "Aujourd'hui" : `${diffDaysNum} jours`;
 
-    let diffDays = Math.floor(today.diff(departDate, "days").days) + " jours";
-    if (diffDays === "0 jours") diffDays = "Aujourd'hui";
-
+    // MaxLove stats
     const totalMaxLove = getMaxLoveCount();
     const leaderboard = getMaxLoveLeaderboard();
+    const statsPerDay = getMaxLoveStatsPerDay();
 
-    const sorted = [...leaderboard].sort((a, b) => b[1] - a[1]);
-    const hearts = ["💗", "💖", "💘", "💞", "💕"];
-
+    // Classement MaxLove
     let topMaxLove = "Aucun MaxLove pour le moment 😢";
-    if (sorted.length > 0) {
-      // 🔹 résoudre les async avec Promise.all
-      const topPromises = sorted.slice(0, 5).map(async ([user, score], i) => {
-        const rank = await getRank(score, false);
-        return `**${i + 1}.** <@${user}> (${rank}) **— ${score} ${
-          hearts[i] ?? "❤️"
-        }**`;
-      });
-      topMaxLove = (await Promise.all(topPromises)).join("\n");
+    if (leaderboard.length > 0) {
+      const sorted = [...leaderboard].sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const hearts = ["💗", "💖", "💘", "💞", "💕"];
+      const entries = await Promise.all(
+        sorted.map(async ([user, score], i) => {
+          const rank = await getRank(score, false);
+          return `**${i + 1}.** <@${user}> (${rank}) **— ${score} ${
+            hearts[i] ?? "❤️"
+          }**`;
+        })
+      );
+      topMaxLove = entries.join("\n");
     }
 
-    const statsPerDay = getMaxLoveStatsPerDay();
+    // Jour avec le plus de MaxLove
     let maxDayText = "Aucun MaxLove envoyé";
-    if (Object.keys(statsPerDay).length > 0) {
-      const maxEntry = Object.entries(statsPerDay).reduce((a, b) =>
-        b[1] > a[1] ? b : a
-      );
-      const day = DateTime.fromISO(maxEntry[0])
+    const days = Object.entries(statsPerDay);
+    if (days.length > 0) {
+      const [bestDay, bestValue] = days.reduce((a, b) => (b[1] > a[1] ? b : a));
+      const formatted = DateTime.fromISO(bestDay)
         .setLocale("fr")
         .toLocaleString(DateTime.DATE_FULL);
-      maxDayText = `${day} (${maxEntry[1]} MaxLoves)`;
+      maxDayText = `${formatted} (${bestValue} MaxLoves)`;
     }
+
+    const now = new Date().toLocaleString("fr-FR");
+    console.log(`📦 [${now}] Données traitées :`, {
+      totalDistance,
+      totalCountries,
+      totalSteps,
+      totalMaxLove,
+      maxDayText,
+      leaderboardSize: leaderboard.length,
+    });
 
     const embed = new EmbedBuilder()
       .setColor(0xff66cc)
       .setTitle("📊 MaxStats")
       .setDescription(
-        `**📅 Nombre de jours depuis le départ :** ${diffDays}\n\n` +
-          `**📏 Kilomètres parcourus :** ${totalDistance}km\n\n` +
-          `**🎯 Nombre d'étapes :** ${totalSteps}\n\n` +
-          `**🌍 Nombre de pays visités :** ${totalCountries}\n${allFlags}\n\n` +
-          `**💗 Total de MaxLove envoyés :** ${totalMaxLove}\n\n` +
-          `**📈 Jour avec le plus de MaxLove :** ${maxDayText}\n\n` +
-          `**🏆 Top 5 MaxLove :**\n${topMaxLove}`
+        [
+          `**📅 Nombre de jours depuis le départ :** ${diffDays}`,
+          `**📏 Kilomètres parcourus :** ${totalDistance}`,
+          `**🎯 Nombre d'étapes :** ${totalSteps ?? "Inconnu"}`,
+          `**🌍 Nombre de pays visités :** ${totalCountries ?? "Inconnu"} ${
+            allFlags ? `\n${allFlags}` : ""
+          }`,
+          `**💗 Total de MaxLove envoyés :** ${totalMaxLove}`,
+          `**📈 Jour avec le plus de MaxLove :** ${maxDayText}`,
+          `**🏆 Top 5 MaxLove :**\n${topMaxLove}`,
+        ].join("\n\n")
       )
       .setFooter({ text: "MaxTripBot • Stats" });
 
     if (interaction) await interaction.editReply({ embeds: [embed] });
     else if (message) await message.reply({ embeds: [embed] });
   } catch (error) {
-    console.error("Erreur lors de la récupération des MaxStats :", error);
-    const errorText = "❌ Impossible de récupérer les statistiques.";
-
+    console.error("❌ Erreur lors de la récupération des MaxStats :", error);
+    const msg = "❌ Impossible de récupérer les statistiques.";
     if (interaction) {
-      if (interaction.deferred || interaction.replied) {
-        await interaction.editReply(errorText);
-      } else {
-        await interaction.reply(errorText);
-      }
+      if (interaction.deferred || interaction.replied)
+        await interaction.editReply(msg);
+      else await interaction.reply(msg);
     } else if (message) {
-      await message.reply(errorText);
+      await message.reply(msg);
     }
   }
 }
