@@ -7,7 +7,9 @@ import { newMediaMessage } from "../utils/newMediaMessage";
 
 export function registerEvents(client: Client) {
   client.once("clientReady", () => {
-    console.log(`✅ Connecté en tant que ${client.user?.tag}\n\n---`);
+    console.log(
+      `✅ Connecté en tant que ${client.user?.tag}\n------------------------`
+    );
 
     setDailyMaximeMessage(client);
     checkNewStepInPayload(client);
