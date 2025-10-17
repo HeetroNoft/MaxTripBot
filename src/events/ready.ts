@@ -25,7 +25,8 @@ function setDailyMaximeMessage(client: Client) {
   cron.schedule(
     "1 6 * * *",
     () => {
-      console.log("🕗 [CRON] Exécution du message quotidien !");
+      const now = new Date().toLocaleString("fr-FR");
+      console.log(`🕗 [${now}] [CRON] Exécution du message quotidien !`);
       dailyMaximeMessage(client);
     },
     {
@@ -53,7 +54,7 @@ async function checkNewStepInPayload(client: Client) {
     latestStepId,
     `${latestStepCountry}, ${latestStepLocality}`
   );
-  cron.schedule("10 * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     const now = new Date().toLocaleString("fr-FR");
     console.log(`🕗 [${now}] [CRON] Exécution de la mise à jour du payload...`);
     const latestStepId = await getDataPayload<any>("id", true, false);
@@ -83,7 +84,7 @@ async function checkNewMediaInStep(client: Client) {
     latestMedia?.path
   );
 
-  cron.schedule("10 * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     const now = new Date().toLocaleString("fr-FR");
     console.log(
       `🕗 [${now}] [CRON] Exécution de la mise à jour de la dernière image`
