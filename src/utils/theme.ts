@@ -19,4 +19,5 @@ export const ThemeColors = {
   Info: 0x5865f2,
   Polarsteps: 0x00293d,
   MaxLove: 0xff69b4,
+  Australia: 0xffc400,
 };

@@ -55,7 +55,7 @@ export async function execute({ interaction }: any) {
 
     // 🔹 Créer un embed
     const embed = new EmbedBuilder()
-      .setColor(ThemeColors.Info)
+      .setColor(ThemeColors.Australia)
       .setTitle(`${todayWord.word} ${todayWord.emoji}`)
       .setDescription(`Signification : **${todayWord.meaning}**`)
       .setFooter({
