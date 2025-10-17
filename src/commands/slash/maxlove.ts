@@ -6,6 +6,7 @@ import {
   canUseMaxLove,
   getCooldownRemaining,
   getRank,
+  getMaxLoveToday,
 } from "../../utils/maxLoveManager";
 import { ThemeColors } from "../../utils/theme";
 
@@ -71,6 +72,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 
   addMaxLove(userId);
   const personalCount = getMaxLoveCount(userId);
+  const personalCountToday = getMaxLoveToday(userId);
   const rank = await getRank({ maxLove: personalCount, dataReturn: "rank" });
 
   const embed = new EmbedBuilder()
@@ -78,7 +80,8 @@ export async function execute({ interaction, message }: { interaction?: any; mes
     .setTitle("💖 MaxLove !")
     .setDescription(
       `Un peu d’amour pour <@${MaxUserId}> !\n\n` +
-        `**<@${userId}>** (${rank}) a maintenant envoyé **${personalCount}** MaxLove.`
+        `**<@${userId}>** (${rank}) a maintenant envoyé **${personalCount}** MaxLove.\n\n` +
+        `*Aujourd'hui, tu as déjà envoyé **${personalCountToday}** MaxLove.*`
     )
     .setFooter({ text: "MaxTripBot • Love pour Maxime" });
 

@@ -31,6 +31,9 @@ try {
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 }
 
+// Cooldown
+const COOLDOWN_DURATION = 3600000; // 1h
+
 // Fonctions
 export function addMaxLove(userId: string) {
   if (!data[userId]) data[userId] = { count: 0, lastUsed: 0, history: [] };
@@ -53,9 +56,6 @@ export function getMaxLoveLeaderboard(top = 5) {
     .slice(0, top);
   return sorted.map(([userId, u]) => [userId, u.count] as [string, number]);
 }
-
-// Cooldown
-const COOLDOWN_DURATION = 3600000; // 1h
 
 export function canUseMaxLove(userId: string) {
   const lastUsed = data[userId]?.lastUsed || 0;
@@ -116,7 +116,6 @@ export async function getRank({
   }
 }
 
-// Nouvelle fonction : stats par jour
 export function getMaxLoveStatsPerDay() {
   const stats: Record<string, number> = {}; // { "2025-10-14": 5 }
 
@@ -130,7 +129,17 @@ export function getMaxLoveStatsPerDay() {
   return stats;
 }
 
-// Sauvegarde
+export function getMaxLoveToday(userId: string): number {
+  const user = data[userId];
+  if (!user) return 0;
+
+  const today = DateTime.now().setZone("Europe/Paris").toISODate(); // "YYYY-MM-DD"
+  return user.history.filter((timestamp) => {
+    const day = DateTime.fromMillis(timestamp).setZone("Europe/Paris").toISODate();
+    return day === today;
+  }).length;
+}
+
 function saveData() {
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 }
