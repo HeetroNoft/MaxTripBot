@@ -16,7 +16,7 @@ export const ThemeColors = {
   Success: 0x00ff00,
   Warning: 0xff8000,
   Error: 0xff0059,
-  Info: 0x3498db,
+  Info: 0x5865f2,
   Polarsteps: 0x00293d,
   MaxLove: 0xff69b4,
 };
