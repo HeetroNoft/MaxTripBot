@@ -82,7 +82,7 @@ export async function execute({
     }
 
     const now = new Date().toLocaleString("fr-FR");
-    console.log(`📦 [${now}] Données traitées :`, {
+    console.log(`📦 [${now}] (/maxstats) Données traitées :`, {
       totalDistance,
       totalCountries,
       totalSteps,
