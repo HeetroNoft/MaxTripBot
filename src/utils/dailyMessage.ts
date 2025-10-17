@@ -71,7 +71,7 @@ export async function dailyMaximeMessage(client: Client) {
   } else {
     messageText = `📅 **Message du jour — ${formattedTodayDate}**\n\nCela fait maintenant **${diffDays} jour${
       diffDays > 1 ? "s" : ""
-    }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\nN'oubliez pas le **/maxword** du jour !\n\n*${randomPhrase}*\n\nDate de départ : ${formattedDepartDate}`;
+    }** depuis le départ de <@328795495936032768> en Australie 🇦🇺\nIl a reçu **${total} MaxLove** 💖 !\n\nN'oubliez pas le **/maxword** du jour !\n\n*${randomPhrase}*`;
   }
 
   // 🚀 Envoi du message

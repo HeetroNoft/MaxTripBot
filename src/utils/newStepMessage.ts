@@ -20,5 +20,4 @@ export async function newStepMessage(client: Client) {
 
   // 🚀 Envoi du message
   await channel.send(messageText);
-  console.log(`✅ Message quotidien envoyé dans #${channel.name}`);
 }

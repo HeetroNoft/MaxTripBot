@@ -45,12 +45,28 @@ client.prefix = process.env.PREFIX || "!";
       await command.execute({ interaction, client });
     } catch (error) {
       console.error(error);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content:
-            "Une erreur est survenue lors de l'exécution de la commande.",
-          flags: 64,
-        });
+
+      try {
+        if (interaction.deferred) {
+          await interaction.editReply({
+            content:
+              "Une erreur est survenue lors de l'exécution de la commande.",
+          });
+        } else if (!interaction.replied) {
+          await interaction.reply({
+            content:
+              "Une erreur est survenue lors de l'exécution de la commande.",
+            ephemeral: true,
+          });
+        } else {
+          await interaction.followUp({
+            content:
+              "Une erreur est survenue lors de l'exécution de la commande.",
+            ephemeral: true,
+          });
+        }
+      } catch (err) {
+        console.warn("Impossible d'envoyer une réponse à l'interaction :", err);
       }
     }
   });

@@ -54,7 +54,8 @@ async function checkNewStepInPayload(client: Client) {
     `${latestStepCountry}, ${latestStepLocality}`
   );
   cron.schedule("10 * * * *", async () => {
-    console.log("🕗 [CRON] Exécution de la mise à jour du payload...");
+    const now = new Date().toLocaleString("fr-FR");
+    console.log(`🕗 [${now}] [CRON] Exécution de la mise à jour du payload...`);
     const latestStepId = await getDataPayload<any>("id", true, false);
     const newLatestStepId = await getDataPayload<any>("id", true);
     if (latestStepId && newLatestStepId && latestStepId === newLatestStepId) {
@@ -83,7 +84,10 @@ async function checkNewMediaInStep(client: Client) {
   );
 
   cron.schedule("10 * * * *", async () => {
-    console.log("🕗 [CRON] Exécution de la mise à jour de la dernière image");
+    const now = new Date().toLocaleString("fr-FR");
+    console.log(
+      `🕗 [${now}] [CRON] Exécution de la mise à jour de la dernière image`
+    );
     const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
     const latestMedia =
       mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
