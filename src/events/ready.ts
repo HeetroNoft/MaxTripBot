@@ -6,9 +6,7 @@ import { newPayloadMessage } from "../utils/newPayloadMessage";
 
 export function registerEvents(client: Client) {
   client.once("clientReady", () => {
-    console.log(
-      `✅ Connecté en tant que ${client.user?.tag}\n------------------------`
-    );
+    console.log(`✅ Connecté en tant que ${client.user?.tag}\n------------------------`);
 
     setDailyMaximeMessage(client);
     checkNewStepInPayload(client);
@@ -45,8 +43,7 @@ async function checkNewStepInPayload(client: Client) {
     // 🔍 Vérifier les nouvelles étapes ou médias
     const latestStepId = await getDataPayload<any>("id", true, false);
     const mediaArray = (await getDataPayload<any>("media", true, false)) || [];
-    const latestMedia =
-      mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
+    const latestMedia = mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
 
     const newLatestStepId = await getDataPayload<any>("id", true);
     const newMediaArray = (await getDataPayload<any>("media", true)) || [];
@@ -62,11 +59,7 @@ async function checkNewStepInPayload(client: Client) {
     // Même étape, vérifier les médias
     if (latestStepId && newLatestStepId && latestStepId === newLatestStepId) {
       // Même média, rien à faire
-      if (
-        latestMedia &&
-        newLatestMedia &&
-        latestMedia.id === newLatestMedia.id
-      ) {
+      if (latestMedia && newLatestMedia && latestMedia.id === newLatestMedia.id) {
         return undefined;
       } else {
         console.log("🖼️ Nouvelle image détectée !");
@@ -78,7 +71,5 @@ async function checkNewStepInPayload(client: Client) {
       return undefined;
     }
   });
-  console.log(
-    "⏰ Vérification des nouvelles étapes planifiée toutes les 10 minutes"
-  );
+  console.log("⏰ Vérification des nouvelles étapes planifiée toutes les 10 minutes");
 }

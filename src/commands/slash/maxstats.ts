@@ -14,24 +14,17 @@ export const data = new SlashCommandBuilder()
 
 export const aliases = ["maxstats"];
 
-export async function execute({
-  interaction,
-  message,
-}: {
-  interaction?: any;
-  message?: any;
-}) {
+export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
   try {
     if (interaction) await interaction.deferReply();
 
     // Récupération parallèle des données
-    const [totalDistanceRaw, totalCountries, totalSteps, allFlags] =
-      await Promise.all([
-        getDataPayload<number>("total_km"),
-        getDataPayload<number>("nb_country"),
-        getDataPayload<number>("nb_steps"),
-        getDataPayload<string[]>("flag_countries"),
-      ]);
+    const [totalDistanceRaw, totalCountries, totalSteps, allFlags] = await Promise.all([
+      getDataPayload<number>("total_km"),
+      getDataPayload<number>("nb_country"),
+      getDataPayload<number>("nb_steps"),
+      getDataPayload<string[]>("flag_countries"),
+    ]);
 
     const totalDistance =
       typeof totalDistanceRaw === "number"
@@ -43,10 +36,7 @@ export async function execute({
     const departDate = DateTime.fromISO(departISO, {
       zone: "Europe/Paris",
     }).startOf("day");
-    const diffDaysNum = Math.max(
-      0,
-      Math.floor(nowParis.diff(departDate, "days").days)
-    );
+    const diffDaysNum = Math.max(0, Math.floor(nowParis.diff(departDate, "days").days));
     const diffDays = diffDaysNum === 0 ? "Aujourd'hui" : `${diffDaysNum} jours`;
 
     // Statistiques MaxLove
@@ -66,9 +56,7 @@ export async function execute({
             maxLove: score,
             dataReturn: "rank",
           });
-          return `**${i + 1}.** <@${user}> (${rankLabel}) **— ${score} ${
-            hearts[i] ?? "❤️"
-          }**`;
+          return `**${i + 1}.** <@${user}> (${rankLabel}) **— ${score} ${hearts[i] ?? "❤️"}**`;
         })
       );
       topMaxLove = entries.join("\n");
@@ -119,8 +107,7 @@ export async function execute({
     console.error("❌ Erreur lors de la récupération des MaxStats :", error);
     const msg = "❌ Impossible de récupérer les statistiques.";
     if (interaction) {
-      if (interaction.deferred || interaction.replied)
-        await interaction.editReply(msg);
+      if (interaction.deferred || interaction.replied) await interaction.editReply(msg);
       else await interaction.reply(msg);
     } else if (message) {
       await message.reply(msg);

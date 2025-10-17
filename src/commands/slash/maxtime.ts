@@ -21,13 +21,7 @@ function countryCodeToFlagEmoji(code: string | null): string {
   );
 }
 
-export async function execute({
-  interaction,
-  message,
-}: {
-  interaction?: any;
-  message?: any;
-}) {
+export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
   const [timezoneId, country, slug, locality, countryCode] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
     getDataPayload<string>("location.country", true),
@@ -46,9 +40,7 @@ export async function execute({
   const franceTime = DateTime.now().setZone("Europe/Paris");
   const maxTime = tz ? DateTime.now().setZone(tz) : null;
   const city =
-    slugValue.length > 0
-      ? slugValue.replace(/^./, (s) => s.toUpperCase())
-      : localityValue || null;
+    slugValue.length > 0 ? slugValue.replace(/^./, (s) => s.toUpperCase()) : localityValue || null;
   const flag = countryCodeToFlagEmoji(cc);
 
   const diffHours = maxTime ? (maxTime.offset - franceTime.offset) / 60 : 0;

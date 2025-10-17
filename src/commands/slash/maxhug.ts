@@ -14,7 +14,5 @@ export const aliases = ["maxhug"];
 
 export async function execute({ interaction }: any) {
   const random = hugs[Math.floor(Math.random() * hugs.length)];
-  await interaction.reply(
-    random.replace("<@user>", `<@${interaction.user.id}>`)
-  );
+  await interaction.reply(random.replace("<@user>", `<@${interaction.user.id}>`));
 }

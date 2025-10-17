@@ -11,10 +11,8 @@ export async function execute({ interaction, message }: any) {
   const departISO = process.env.MAX_DEPART;
 
   if (!departISO) {
-    const errorText =
-      "❌ La date de départ n'est pas configurée dans le fichier .env.";
-    if (interaction)
-      return interaction.reply({ content: errorText, flags: 64 });
+    const errorText = "❌ La date de départ n'est pas configurée dans le fichier .env.";
+    if (interaction) return interaction.reply({ content: errorText, flags: 64 });
     if (message) return message.reply(errorText);
     return;
   }

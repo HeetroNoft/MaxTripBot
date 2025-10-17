@@ -34,9 +34,7 @@ export async function execute({
     const description = command.data?.description || "Pas de description";
     embed.addFields({
       name: `/${name}${
-        options && options.length > 0
-          ? ` - (${options.map((o: any) => o.name).join(", ")})`
-          : ""
+        options && options.length > 0 ? ` - (${options.map((o: any) => o.name).join(", ")})` : ""
       }`,
       value: description,
       inline: false,

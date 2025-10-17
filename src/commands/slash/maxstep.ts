@@ -4,9 +4,7 @@ import { getDataPayload } from "../../utils/dataPayload";
 
 export const data = new SlashCommandBuilder()
   .setName("maxstep")
-  .setDescription(
-    "Affiche la dernière position connue de Maxime sur Polarsteps"
-  );
+  .setDescription("Affiche la dernière position connue de Maxime sur Polarsteps");
 
 export const aliases = ["maxloc", "maxmap"];
 
@@ -50,14 +48,11 @@ export async function execute({ interaction }: any) {
     mediaCount: mediaArray?.length ?? 0,
   });
 
-  const place =
-    locality && country ? `${locality}, ${country}` : "Lieu inconnu";
+  const place = locality && country ? `${locality}, ${country}` : "Lieu inconnu";
   const dateISO = start_time || creation_time || "Date inconnue";
   const dt = DateTime.fromISO(dateISO, { zone: "Europe/Paris" });
   const lastMedia =
-    Array.isArray(mediaArray) && mediaArray.length > 0
-      ? mediaArray[mediaArray.length - 1]
-      : null;
+    Array.isArray(mediaArray) && mediaArray.length > 0 ? mediaArray[mediaArray.length - 1] : null;
 
   let image =
     lastMedia?.path ||
@@ -66,21 +61,12 @@ export async function execute({ interaction }: any) {
     screenshot_url ||
     null;
 
-  if (
-    image &&
-    typeof image === "string" &&
-    !image.toLowerCase().endsWith(".jpg")
-  ) {
+  if (image && typeof image === "string" && !image.toLowerCase().endsWith(".jpg")) {
     image =
-      lastMedia?.large_thumbnail_path ||
-      lastMedia?.small_thumbnail_path ||
-      screenshot_url ||
-      null;
+      lastMedia?.large_thumbnail_path || lastMedia?.small_thumbnail_path || screenshot_url || null;
   }
 
-  const title =
-    display_name ||
-    (locality ? `Halte à ${locality}` : "Dernière position de Maxime");
+  const title = display_name || (locality ? `Halte à ${locality}` : "Dernière position de Maxime");
 
   const embed = new EmbedBuilder()
     .setColor(0x00aaff)

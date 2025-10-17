@@ -7,13 +7,7 @@ export const data = new SlashCommandBuilder()
 
 export const aliases = ["maxdance"];
 
-export async function execute({
-  interaction,
-  message,
-}: {
-  interaction?: any;
-  message?: any;
-}) {
+export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
   // Résolution du chemin absolu
   const gifPath = path.join(__dirname, "../../../src/assets/gif/maxdance.gif");
 

@@ -12,9 +12,7 @@ interface OpenMeteoResponse {
 
 export const data = new SlashCommandBuilder()
   .setName("maxweather")
-  .setDescription(
-    "Affiche la météo actuelle à la localisation de Maxime (Open-Meteo)"
-  );
+  .setDescription("Affiche la météo actuelle à la localisation de Maxime (Open-Meteo)");
 export const aliases = ["maxweather"];
 
 export async function execute({ interaction }: { interaction: any }) {
@@ -28,9 +26,7 @@ export async function execute({ interaction }: { interaction: any }) {
       getDataPayload("location.lon", true),
     ]);
 
-    const location = `${locality ?? "Lieu inconnu"}${
-      country ? `, ${country}` : ""
-    }`;
+    const location = `${locality ?? "Lieu inconnu"}${country ? `, ${country}` : ""}`;
     const latitude = Number(lat) || -31.57;
     const longitude = Number(lon) || 115.52;
 
@@ -40,15 +36,11 @@ export async function execute({ interaction }: { interaction: any }) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data: OpenMeteoResponse = await response.json();
     const cw = data.current_weather;
-    if (!cw)
-      return interaction.editReply(
-        "❌ Impossible de récupérer la météo actuelle."
-      );
+    if (!cw) return interaction.editReply("❌ Impossible de récupérer la météo actuelle.");
 
     const { temperature, windspeed, weathercode } = cw;
     const { description, emoji } = weathercodeToTextAndEmoji(weathercode);
-    const tempEmoji =
-      temperature >= 30 ? "🔥" : temperature <= 10 ? "❄️" : "🌡️";
+    const tempEmoji = temperature >= 30 ? "🔥" : temperature <= 10 ? "❄️" : "🌡️";
 
     const now = new Date().toLocaleString("fr-FR");
     console.log(`📦 [${now}] (/maxweather) Données récupérées :`, {

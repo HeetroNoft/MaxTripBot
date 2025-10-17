@@ -4,21 +4,12 @@ import { getMaxLoveCount, getRank } from "../../utils/maxLoveManager";
 export const data = new SlashCommandBuilder()
   .setName("maxrank")
   .setDescription("Affiche la liste des rangs ou le rang d’un utilisateur")
-  .addUserOption((o) =>
-    o.setName("user").setDescription("Utilisateur à inspecter")
-  );
+  .addUserOption((o) => o.setName("user").setDescription("Utilisateur à inspecter"));
 
 export const aliases = ["maxrank"];
 
-export async function execute({
-  interaction,
-  message,
-}: {
-  interaction?: any;
-  message?: any;
-}) {
-  const user =
-    interaction?.options?.getUser("user") ?? message?.mentions?.users?.first();
+export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
+  const user = interaction?.options?.getUser("user") ?? message?.mentions?.users?.first();
   const target = user ?? interaction?.user ?? message?.author;
 
   if (user) return showUserRank(target, interaction, message);
@@ -33,13 +24,10 @@ async function showUserRank(user: any, interaction?: any, message?: any) {
 
   // Trouve le prochain rang (plus simple à calculer via la même fonction)
   const nextRankData = await getRank({ maxLove, dataReturn: "nextRank" });
-  const nextRank = nextRankData
-    ? `${nextRankData.emoji} ${nextRankData.name}`
-    : null;
+  const nextRank = nextRankData ? `${nextRankData.emoji} ${nextRankData.name}` : null;
   const nextMinLove = nextRankData ? nextRankData.minLove : null;
 
-  const missing =
-    nextMinLove && nextMinLove > maxLove ? nextMinLove - maxLove : 0;
+  const missing = nextMinLove && nextMinLove > maxLove ? nextMinLove - maxLove : 0;
 
   const now = new Date().toLocaleString("fr-FR");
   console.log(`📦 [${now}] (/maxrank @${user.id}) Données traitées :`, {

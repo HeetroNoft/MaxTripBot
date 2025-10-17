@@ -35,9 +35,7 @@ client.prefix = process.env.PREFIX || "!";
 
     // ❌ Sécurité : vérifier que execute existe
     if (!command || typeof command.execute !== "function") {
-      console.warn(
-        `⚠️ Commande ${interaction.commandName} non trouvée ou execute manquant`
-      );
+      console.warn(`⚠️ Commande ${interaction.commandName} non trouvée ou execute manquant`);
       return;
     }
 
@@ -49,19 +47,16 @@ client.prefix = process.env.PREFIX || "!";
       try {
         if (interaction.deferred) {
           await interaction.editReply({
-            content:
-              "Une erreur est survenue lors de l'exécution de la commande.",
+            content: "Une erreur est survenue lors de l'exécution de la commande.",
           });
         } else if (!interaction.replied) {
           await interaction.reply({
-            content:
-              "Une erreur est survenue lors de l'exécution de la commande.",
+            content: "Une erreur est survenue lors de l'exécution de la commande.",
             ephemeral: true,
           });
         } else {
           await interaction.followUp({
-            content:
-              "Une erreur est survenue lors de l'exécution de la commande.",
+            content: "Une erreur est survenue lors de l'exécution de la commande.",
             ephemeral: true,
           });
         }

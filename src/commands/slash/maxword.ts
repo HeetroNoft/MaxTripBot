@@ -17,9 +17,7 @@ export async function execute({ interaction }: any) {
     const departISO = process.env.MAX_DEPART;
     if (!departISO) {
       console.error("❌ MAX_DEPART manquant dans .env");
-      return interaction.editReply(
-        "❌ Impossible de récupérer la date de départ de Maxime."
-      );
+      return interaction.editReply("❌ Impossible de récupérer la date de départ de Maxime.");
     }
 
     // 🕓 Gestion précise des fuseaux horaires
@@ -60,16 +58,12 @@ export async function execute({ interaction }: any) {
       .setTitle(`${todayWord.word} ${todayWord.emoji}`)
       .setDescription(`Signification : **${todayWord.meaning}**`)
       .setFooter({
-        text: `Découvre un mot australien avec Maxime • Mot ${index + 1} / ${
-          words.length
-        }`,
+        text: `Découvre un mot australien avec Maxime • Mot ${index + 1} / ${words.length}`,
       });
 
     await interaction.editReply({ embeds: [embed] });
   } catch (err) {
     console.error("Erreur maxword :", err);
-    await interaction.editReply(
-      "❌ Oops, impossible de récupérer un mot australien !"
-    );
+    await interaction.editReply("❌ Oops, impossible de récupérer un mot australien !");
   }
 }

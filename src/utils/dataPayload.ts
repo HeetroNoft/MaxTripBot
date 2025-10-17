@@ -53,9 +53,7 @@ export async function updatePayload(): Promise<any | undefined> {
     await new Promise((r) => setTimeout(r, 4000));
     await browser.close();
 
-    const payload = payloads
-      .map((p) => p?.trip || p)
-      .find((p) => p?.id === 22019906);
+    const payload = payloads.map((p) => p?.trip || p).find((p) => p?.id === 22019906);
 
     if (!payload) {
       console.error("⚠️ Aucun payload trouvé pour le trip spécifié.");
@@ -116,9 +114,7 @@ export async function getDataPayload<T = unknown>(
           useZelda = false;
         } else {
           useZelda = true;
-          console.warn(
-            "lastStepLocality !== latestZeldaLocality, utilisation de Zelda"
-          );
+          console.warn("lastStepLocality !== latestZeldaLocality, utilisation de Zelda");
         }
       }
       if (!latestStep) {
@@ -193,20 +189,14 @@ function flagCountries(payload: { zelda_steps: any[] }): string {
   for (const step of zSteps) {
     const countryCode = step?.location?.country_code;
     // Vérification : au moins une lettre et aucun chiffre
-    if (
-      countryCode &&
-      /^[A-Za-z]+$/.test(countryCode) &&
-      countryCode.length >= 1
-    ) {
+    if (countryCode && /^[A-Za-z]+$/.test(countryCode) && countryCode.length >= 1) {
       countries.add(countryCode.toUpperCase());
     }
   }
 
   const flags = [...countries]
     .map((countryCode) => {
-      const codePoints = [...countryCode].map(
-        (char) => 0x1f1e6 + char.charCodeAt(0) - 65
-      );
+      const codePoints = [...countryCode].map((char) => 0x1f1e6 + char.charCodeAt(0) - 65);
       return String.fromCodePoint(...codePoints);
     })
     .join(" ");

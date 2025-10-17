@@ -1,9 +1,6 @@
 import { TextChannel, Client } from "discord.js";
 
-export async function newPayloadMessage(
-  client: Client,
-  isNewMedia: boolean = false
-) {
+export async function newPayloadMessage(client: Client, isNewMedia: boolean = false) {
   const channelId = process.env.DAILY_CHANNEL_ID;
 
   if (!channelId) {

@@ -18,8 +18,7 @@ export async function execute({
 }) {
   const TRIP_URL = process.env.TRIP_URL;
 
-  const pictureUrl =
-    (await getDataPayload<string>("cover_photo.large_thumbnail_path")) || null;
+  const pictureUrl = (await getDataPayload<string>("cover_photo.large_thumbnail_path")) || null;
   const userId = "328795495936032768";
   const user = await client.users.fetch(userId);
 

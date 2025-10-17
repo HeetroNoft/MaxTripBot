@@ -28,16 +28,12 @@ dotenv.config({ path: ".env" });
     }
 
     // 🔹 Initialisation du client REST avec ton token
-    const rest = new REST({ version: "10" }).setToken(
-      process.env.DISCORD_TOKEN!
-    );
+    const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
     // Liste des serveurs où déployer
     const guildIds = process.env.GUILD_IDS?.split(",") || [];
     if (guildIds.length === 0) {
-      console.log(
-        "⚠️ Aucune GUILD_ID fournie dans .env (GUILD_IDS séparées par des virgules)"
-      );
+      console.log("⚠️ Aucune GUILD_ID fournie dans .env (GUILD_IDS séparées par des virgules)");
       return;
     }
 
@@ -45,10 +41,9 @@ dotenv.config({ path: ".env" });
 
     // 🔹 Déploiement sur chaque serveur
     for (const guildId of guildIds) {
-      await rest.put(
-        Routes.applicationGuildCommands(process.env.CLIENT_ID!, guildId.trim()),
-        { body: commands }
-      );
+      await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID!, guildId.trim()), {
+        body: commands,
+      });
       console.log(`✅ Commandes slash déployées sur le serveur ${guildId}`);
     }
 

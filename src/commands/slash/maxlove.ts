@@ -13,13 +13,7 @@ export const data = new SlashCommandBuilder()
   .setDescription("Un peu d'amour pour Maxime ! (⏱ 1h)");
 export const aliases = ["maxlove"];
 
-export async function execute({
-  interaction,
-  message,
-}: {
-  interaction?: any;
-  message?: any;
-}) {
+export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
   const userId = interaction?.user?.id || message?.author?.id;
   if (!userId) return;
 
@@ -55,8 +49,7 @@ export async function execute({
       .setFooter({ text: "MaxTripBot • Patience !" });
 
     return (
-      interaction?.reply?.({ embeds: [embed], flags: 64 }) ||
-      message?.reply?.({ embeds: [embed] })
+      interaction?.reply?.({ embeds: [embed], flags: 64 }) || message?.reply?.({ embeds: [embed] })
     );
   }
 
@@ -71,8 +64,7 @@ export async function execute({
       .setFooter({ text: "MaxTripBot • Patience !" });
 
     return (
-      interaction?.reply?.({ embeds: [embed], flags: 64 }) ||
-      message?.reply?.({ embeds: [embed] })
+      interaction?.reply?.({ embeds: [embed], flags: 64 }) || message?.reply?.({ embeds: [embed] })
     );
   }
 

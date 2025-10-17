@@ -54,9 +54,7 @@ export async function dailyMaximeMessage(client: Client) {
 
   // 🔹 Formater les dates à partir de today / departDate (pas nowParis)
   const formattedTodayDate = today.setLocale("fr").toFormat("dd LLLL yyyy");
-  const formattedDepartDate = departDate
-    .setLocale("fr")
-    .toFormat("dd LLLL yyyy");
+  const formattedDepartDate = departDate.setLocale("fr").toFormat("dd LLLL yyyy");
 
   // 💬 Générer le message
   let messageText: string;

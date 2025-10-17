@@ -2,6 +2,7 @@
 import fs from "fs";
 import { DateTime } from "luxon";
 import path from "path";
+import { RankColors } from "./theme";
 
 const DATA_DIR = path.join(__dirname, "../../data");
 const FILE = path.join(DATA_DIR, "maxlove_history.json");
@@ -73,26 +74,19 @@ export async function getRank({
   evolved = false,
 }: {
   maxLove?: number;
-  dataReturn:
-    | "color"
-    | "minLove"
-    | "name"
-    | "emoji"
-    | "rank"
-    | "nextRank"
-    | "ranks";
+  dataReturn: "color" | "minLove" | "name" | "emoji" | "rank" | "nextRank" | "ranks";
   evolved?: boolean;
 }): Promise<any> {
   const RANKS = [
-    { minLove: 0, name: "Novice", emoji: "🌱", color: 0x808080 },
-    { minLove: 50, name: "Cuivre", emoji: "🟠", color: 0x8a4000 },
-    { minLove: 100, name: "Bronze", emoji: "🥉", color: 0x8a5700 },
-    { minLove: 250, name: "Silver", emoji: "🥈", color: 0xebebeb },
-    { minLove: 500, name: "Gold", emoji: "🥇", color: 0xffb700 },
-    { minLove: 800, name: "Platine", emoji: "🔷", color: 0x006acf },
-    { minLove: 1200, name: "Émeraude", emoji: "💚", color: 0x48c849 },
-    { minLove: 2000, name: "Diamant", emoji: "💎", color: 0x2bdcff },
-    { minLove: 3000, name: "Légende", emoji: "🌟", color: 0xea00ff },
+    { minLove: 0, name: "Novice", emoji: "🌱", color: RankColors.Novice },
+    { minLove: 50, name: "Cuivre", emoji: "🟠", color: RankColors.Cuivre },
+    { minLove: 100, name: "Bronze", emoji: "🥉", color: RankColors.Bronze },
+    { minLove: 250, name: "Silver", emoji: "🥈", color: RankColors.Silver },
+    { minLove: 500, name: "Gold", emoji: "🥇", color: RankColors.Gold },
+    { minLove: 800, name: "Platine", emoji: "🔷", color: RankColors.Platine },
+    { minLove: 1200, name: "Émeraude", emoji: "💚", color: RankColors.Emeraude },
+    { minLove: 2000, name: "Diamant", emoji: "💎", color: RankColors.Diamant },
+    { minLove: 3000, name: "Légende", emoji: "🌟", color: RankColors.Légende },
   ];
 
   let currentRank = null;
@@ -114,9 +108,7 @@ export async function getRank({
     case "emoji":
       return currentRank ? currentRank.emoji : undefined;
     case "rank":
-      return currentRank
-        ? `${currentRank.emoji} ${currentRank.name}`
-        : undefined;
+      return currentRank ? `${currentRank.emoji} ${currentRank.name}` : undefined;
     case "nextRank":
       return nextRank;
     case "ranks":
@@ -130,9 +122,7 @@ export function getMaxLoveStatsPerDay() {
 
   Object.values(data).forEach((user) => {
     user.history.forEach((timestamp) => {
-      const day = DateTime.fromMillis(timestamp)
-        .setZone("Europe/Paris")
-        .toISODate() as string; // format "YYYY-MM-DD" en heure française
+      const day = DateTime.fromMillis(timestamp).setZone("Europe/Paris").toISODate() as string; // format "YYYY-MM-DD" en heure française
       stats[day] = (stats[day] || 0) + 1;
     });
   });
