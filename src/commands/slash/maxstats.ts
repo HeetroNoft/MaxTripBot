@@ -7,6 +7,7 @@ import {
 } from "../../utils/maxLoveManager";
 import { getDataPayload } from "../../utils/dataPayload";
 import { DateTime } from "luxon";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxstats")
@@ -84,7 +85,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
     });
 
     const embed = new EmbedBuilder()
-      .setColor(0xff66cc)
+      .setColor(ThemeColors.Info)
       .setTitle("📊 MaxStats")
       .setDescription(
         [

@@ -2,6 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import fs from "fs";
 import path from "path";
 import { DateTime } from "luxon";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxword")
@@ -32,7 +33,7 @@ export async function execute({ interaction }: any) {
     if (diffDays < 0) {
       const remainingDays = Math.ceil(Math.abs(diffDays));
       const embed = new EmbedBuilder()
-        .setColor(0xff0059)
+        .setColor(ThemeColors.Error)
         .setTitle("⏳ MaxWord indisponible")
         .setDescription(
           `Hey ! Maxime n’est pas encore parti pour l’Australie 🇦🇺\n` +
@@ -54,7 +55,7 @@ export async function execute({ interaction }: any) {
 
     // 🔹 Créer un embed
     const embed = new EmbedBuilder()
-      .setColor(0xffcc00)
+      .setColor(ThemeColors.Info)
       .setTitle(`${todayWord.word} ${todayWord.emoji}`)
       .setDescription(`Signification : **${todayWord.meaning}**`)
       .setFooter({

@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { DateTime } from "luxon";
 import { getDataPayload } from "../../utils/dataPayload";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxstep")
@@ -69,7 +70,7 @@ export async function execute({ interaction }: any) {
   const title = display_name || (locality ? `Halte à ${locality}` : "Dernière position de Maxime");
 
   const embed = new EmbedBuilder()
-    .setColor(0x00aaff)
+    .setColor(ThemeColors.Polarsteps)
     .setTitle(title)
     .setDescription(
       `${description ? `${description}\n\n` : ""}📍 **${place}**\n🗓️ ${

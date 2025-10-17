@@ -14,7 +14,9 @@ export const RankColors = {
 // Couleurs génériques pour le bot / embeds
 export const ThemeColors = {
   Success: 0x00ff00,
-  Warning: 0xffcc00,
-  Error: 0xff0000,
+  Warning: 0xff8000,
+  Error: 0xff0059,
   Info: 0x3498db,
+  Polarsteps: 0x00293d,
+  MaxLove: 0xff69b4,
 };

@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { getDataPayload } from "../../utils/dataPayload";
 import { DateTime } from "luxon";
+import { ThemeColors } from "../../utils/theme";
 
 interface OpenMeteoResponse {
   current_weather?: {
@@ -57,7 +58,7 @@ export async function execute({ interaction }: { interaction: any }) {
 
     const embed = new EmbedBuilder()
       .setTitle(`🌤️ Météo à ${location}`)
-      .setColor(0x1e90ff)
+      .setColor(ThemeColors.Info)
       .addFields(
         {
           name: "Température",

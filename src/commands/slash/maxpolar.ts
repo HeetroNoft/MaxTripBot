@@ -1,5 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getDataPayload } from "../../utils/dataPayload";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxpolar")
@@ -23,7 +24,7 @@ export async function execute({
   const user = await client.users.fetch(userId);
 
   const embed = new EmbedBuilder()
-    .setColor(0x4ceb34)
+    .setColor(ThemeColors.Polarsteps)
     .setTitle("Polarsteps de Maxime")
     .setURL(TRIP_URL as string)
     .setDescription(`Découvrez le voyage en Australie de Maxime 🇦🇺🦘🌏`)

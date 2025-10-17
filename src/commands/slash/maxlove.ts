@@ -7,6 +7,7 @@ import {
   getCooldownRemaining,
   getRank,
 } from "../../utils/maxLoveManager";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxlove")
@@ -38,7 +39,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 
   if (diffDays < 0) {
     const embed = new EmbedBuilder()
-      .setColor(0xff0059)
+      .setColor(ThemeColors.Error)
       .setTitle("⏳ MaxLove indisponible")
       .setDescription(
         `Hey **<@${userId}>** ! Maxime n’est pas encore parti 🇦🇺\n` +
@@ -56,7 +57,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
   if (!canUseMaxLove(userId)) {
     const minutes = Math.ceil(getCooldownRemaining(userId) / 60000);
     const embed = new EmbedBuilder()
-      .setColor(0xff4500)
+      .setColor(ThemeColors.Warning)
       .setTitle("⏱ MaxLove Cooldown")
       .setDescription(
         `Hey **<@${userId}>** ! Attends encore **${minutes} minute(s)** avant de pouvoir envoyer un MaxLove.`
@@ -73,7 +74,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
   const rank = await getRank({ maxLove: personalCount, dataReturn: "rank" });
 
   const embed = new EmbedBuilder()
-    .setColor(0xff69b4)
+    .setColor(ThemeColors.MaxLove)
     .setTitle("💖 MaxLove !")
     .setDescription(
       `Un peu d’amour pour <@${MaxUserId}> !\n\n` +

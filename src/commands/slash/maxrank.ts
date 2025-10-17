@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { getMaxLoveCount, getRank } from "../../utils/maxLoveManager";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxrank")
@@ -65,7 +66,7 @@ async function showRankList(interaction?: any, message?: any) {
 
   const embed = new EmbedBuilder()
     .setTitle("🏅 Rangs MaxLove")
-    .setColor(0xff69b4)
+    .setColor(ThemeColors.Info)
     .setDescription(descParts.join("\n"))
     .setFooter({ text: "MaxTripBot • Rangs et progression" });
 

@@ -1,6 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import fs from "fs";
 import path from "path";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxhelp")
@@ -23,7 +24,7 @@ export async function execute({
     .filter((f) => f.endsWith(".ts") || f.endsWith(".js"));
 
   const embed = new EmbedBuilder()
-    .setColor(0x00ff99)
+    .setColor(ThemeColors.Info)
     .setTitle("📜 Liste des commandes MaxTripBot")
     .setDescription("Voici toutes les commandes disponibles :");
 

@@ -1,6 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { DateTime } from "luxon";
 import { getDataPayload } from "../../utils/dataPayload";
+import { ThemeColors } from "../../utils/theme";
 
 export const data = new SlashCommandBuilder()
   .setName("maxtime")
@@ -56,7 +57,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
   });
 
   const embed = new EmbedBuilder()
-    .setColor(0x1e90ff)
+    .setColor(ThemeColors.Info)
     .setTitle("⏰ Heures actuelles")
     .setDescription(
       `**🇫🇷 France (Paris) :** ${franceTime.toFormat("HH:mm")}\n` +
