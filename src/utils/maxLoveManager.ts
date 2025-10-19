@@ -79,14 +79,14 @@ export async function getRank({
 }): Promise<any> {
   const RANKS = [
     { minLove: 0, name: "Novice", emoji: "🌱", color: RankColors.Novice },
-    { minLove: 50, name: "Cuivre", emoji: "🟠", color: RankColors.Cuivre },
-    { minLove: 100, name: "Bronze", emoji: "🥉", color: RankColors.Bronze },
-    { minLove: 250, name: "Silver", emoji: "🥈", color: RankColors.Silver },
-    { minLove: 500, name: "Gold", emoji: "🥇", color: RankColors.Gold },
-    { minLove: 800, name: "Platine", emoji: "🔷", color: RankColors.Platine },
-    { minLove: 1200, name: "Émeraude", emoji: "💚", color: RankColors.Emeraude },
-    { minLove: 2000, name: "Diamant", emoji: "💎", color: RankColors.Diamant },
-    { minLove: 3000, name: "Légende", emoji: "🌟", color: RankColors.Légende },
+    { minLove: 30, name: "Cuivre", emoji: "🟠", color: RankColors.Cuivre },
+    { minLove: 70, name: "Bronze", emoji: "🥉", color: RankColors.Bronze },
+    { minLove: 180, name: "Silver", emoji: "🥈", color: RankColors.Silver },
+    { minLove: 360, name: "Gold", emoji: "🥇", color: RankColors.Gold },
+    { minLove: 570, name: "Platine", emoji: "🔷", color: RankColors.Platine },
+    { minLove: 870, name: "Émeraude", emoji: "💚", color: RankColors.Emeraude },
+    { minLove: 1400, name: "Diamant", emoji: "💎", color: RankColors.Diamant },
+    { minLove: 2100, name: "Légende", emoji: "🌟", color: RankColors.Légende },
   ];
 
   let currentRank = null;
