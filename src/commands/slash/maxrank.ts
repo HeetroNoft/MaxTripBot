@@ -20,7 +20,11 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 async function showUserRank(user: any, interaction?: any, message?: any) {
   const maxLove = Number(getMaxLoveCount(user.id)) || 0;
 
-  const rank = await getRank({ maxLove, dataReturn: "rank" });
+  let rank = await getRank({ maxLove, dataReturn: "rank" });
+  const preRank = await getRank({ maxLove: maxLove - 1, dataReturn: "rank" });
+  if (rank !== preRank) {
+    rank = await getRank({ maxLove, dataReturn: "rank", evolved: true });
+  }
   const color = await getRank({ maxLove, dataReturn: "color" });
 
   // Trouve le prochain rang (plus simple à calculer via la même fonction)
