@@ -23,6 +23,7 @@ const countryCodeToFlagEmoji = (code?: string | null): string => {
 };
 
 export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
+  await interaction.deferReply();
   const [timezoneId, country, slug, locality, countryCode, steps = []] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
     getDataPayload<string>("location.country", false),
