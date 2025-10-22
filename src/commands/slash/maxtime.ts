@@ -11,50 +11,47 @@ export const data = new SlashCommandBuilder()
 
 export const aliases = ["maxtime", "maxheure"];
 
-function countryCodeToFlagEmoji(code: string | null): string {
+const countryCodeToFlagEmoji = (code?: string | null): string => {
   if (!code || code.length !== 2) return "🏳️";
-  const offset = 0x1f1e6 - 65;
+  const base = 0x1f1e6 - 65;
   return String.fromCodePoint(
     ...code
       .toUpperCase()
       .split("")
-      .map((c) => offset + c.charCodeAt(0))
+      .map((c) => base + c.charCodeAt(0))
   );
-}
+};
 
 export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
-  const [timezoneId, country, slug, locality, countryCode, steps] = await Promise.all([
+  const [timezoneId, country, slug, locality, countryCode, steps = []] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
     getDataPayload<string>("location.country", false),
     getDataPayload<string>("slug", false),
     getDataPayload<string>("location.locality", false),
     getDataPayload<string>("location.country_code", false),
-    getDataPayload<any>("steps", false),
+    getDataPayload<any[]>("steps", false),
   ]);
 
-  const latestStep = (steps || []).sort(
-    (a: any, b: any) =>
-      new Date(b.start_time || b.creation_time).getTime() -
-      new Date(a.start_time || a.creation_time).getTime()
-  )[0];
+  const latestStep = steps
+    .filter((s) => s?.start_time || s?.creation_time)
+    .sort(
+      (a, b) =>
+        new Date(b.start_time || b.creation_time).getTime() -
+        new Date(a.start_time || a.creation_time).getTime()
+    )[0];
 
-  // Normalisation pour éviter undefined
-  const tz = timezoneId ?? latestStep.location.country == country ? latestStep.timezone_id : null;
-  const locCountry = country ?? "Lieu inconnu";
-  const slugValue = slug ?? "";
-  const localityValue = locality ?? "";
-  const cc = countryCode ?? null;
+  const stepCountry = latestStep?.location?.country ?? null;
+  const tz = timezoneId ?? (stepCountry === country ? latestStep?.timezone_id ?? null : null);
 
   const franceTime = DateTime.now().setZone("Europe/Paris");
   const maxTime = tz ? DateTime.now().setZone(tz) : null;
-  const city =
-    slugValue.length > 0 ? slugValue.replace(/^./, (s) => s.toUpperCase()) : localityValue || null;
-  const flag = countryCodeToFlagEmoji(cc);
-
   const diffHours = maxTime ? (maxTime.offset - franceTime.offset) / 60 : 0;
 
-  const now = new Date().toLocaleString("fr-FR");
-  console.log(`📦 [${now}] (/maxtime) Données temps :`, {
+  const locCountry = country ?? "Lieu inconnu";
+  const city = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : locality || null;
+  const flag = countryCodeToFlagEmoji(countryCode);
+
+  console.log(`📦 [${new Date().toLocaleString("fr-FR")}] (/maxtime)`, {
     france: franceTime.toFormat("HH:mm"),
     max: maxTime?.toFormat("HH:mm") ?? "aucune donnée",
     diff: diffHours,
@@ -70,11 +67,10 @@ export async function execute({ interaction, message }: { interaction?: any; mes
       `**🇫🇷 France (Paris) :** ${franceTime.toFormat("HH:mm")}\n` +
         `**${flag} ${locCountry}${city ? ` (${city})` : ""} :** ${
           maxTime ? maxTime.toFormat("HH:mm") : "aucune donnée"
-        }\n\n` +
-        `Différence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
+        }\n\nDifférence de temps : ${diffHours > 0 ? "+" : ""}${diffHours}h`
     )
     .setFooter({ text: "MaxTripBot • Time Info" });
 
-  if (interaction) await interaction.reply({ embeds: [embed] });
-  else if (message) await message.reply({ embeds: [embed] });
+  const target = interaction ?? message;
+  if (target) await target.reply({ embeds: [embed] });
 }
