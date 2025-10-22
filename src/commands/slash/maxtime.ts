@@ -27,11 +27,11 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 
   const [timezoneId, country, slug, locality, countryCode, steps = []] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
-    getDataPayload<string>("location.country", false),
-    getDataPayload<string>("slug", false),
-    getDataPayload<string>("location.locality", false),
-    getDataPayload<string>("location.country_code", false),
-    getDataPayload<any[]>("steps", false),
+    getDataPayload<string>("location.country", true, false),
+    getDataPayload<string>("slug", true, false),
+    getDataPayload<string>("location.locality", true, false),
+    getDataPayload<string>("location.country_code", true, false),
+    getDataPayload<any[]>("steps", false, false),
   ]);
 
   const latestStep = steps
