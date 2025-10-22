@@ -49,9 +49,10 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 
   const maxLat = maxLatStr ? Number(maxLatStr) : undefined;
   const maxLon = maxLonStr ? Number(maxLonStr) : undefined;
+  const fetchTz = await getTimezone(maxLat, maxLon);
 
   // Récupération du fuseau horaire si nécessaire
-  const tz = timezoneId ?? (await getTimezone(maxLat, maxLon)) ?? null;
+  const tz = timezoneId ?? fetchTz ?? null;
 
   const countryValue = country ?? "Lieu inconnu";
   const slugValue = slug ?? "";
@@ -74,6 +75,7 @@ export async function execute({ interaction, message }: { interaction?: any; mes
     flag,
     location: countryValue,
     city,
+    fetchTz,
   });
 
   const embed = new EmbedBuilder()
