@@ -114,7 +114,7 @@ export async function getDataPayload<T = unknown>(
           useZelda = false;
         } else {
           useZelda = true;
-          console.warn("lastStepLocality !== latestZeldaLocality, utilisation de Zelda");
+          /* console.warn("lastStepLocality !== latestZeldaLocality, utilisation de Zelda"); */
         }
       }
       if (!latestStep) {
@@ -148,6 +148,24 @@ export async function getDataPayload<T = unknown>(
 
     if (dataPath === "timeSinceUpdate") {
       return lastSinceUpdate(payload) as any;
+    }
+
+    if (dataPath == "start_time" && useZelda) {
+      dataPath = "time";
+    }
+
+    if (
+      useZelda &&
+      [
+        "media",
+        "display_name",
+        "creation_time",
+        "description",
+        "weather_temperature",
+        "screenshot_url",
+      ].includes(dataPath)
+    ) {
+      return undefined;
     }
 
     const keys = dataPath

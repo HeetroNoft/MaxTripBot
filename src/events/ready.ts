@@ -50,6 +50,9 @@ async function checkNewStepInPayload(client: Client) {
     const newLatestMedia =
       newMediaArray.length > 0 ? newMediaArray[newMediaArray.length - 1] : null;
 
+    /* console.log({ latestStepId, newLatestStepId });
+    console.log({ latestMedia, newLatestMedia }); */
+
     // Pas de nouvelle étape
     if (!latestStepId || !newLatestStepId) {
       console.error("⚠️ Impossible de récupérer les étapes.");
@@ -58,15 +61,19 @@ async function checkNewStepInPayload(client: Client) {
 
     // Même étape, vérifier les médias
     if (latestStepId && newLatestStepId && latestStepId === newLatestStepId) {
+      // Pas de nouvelle image
+      if (!latestMedia || !newLatestMedia) {
+        return undefined;
+      }
       // Même média, rien à faire
       if (latestMedia && newLatestMedia && latestMedia.id === newLatestMedia.id) {
         return undefined;
       } else {
-        console.log("🖼️ Nouvelle image détectée !");
+        console.log(`🖼️ Nouvelle image détectée ! ${latestMedia.id} ➔ ${newLatestMedia.id}`);
         newPayloadMessage(client, true);
       }
     } else {
-      console.log("🚀 Nouvelle step détectée !");
+      console.log(`🚀 Nouvelle step détectée ! ${latestStepId} ➔ ${newLatestStepId}`);
       newPayloadMessage(client);
       return undefined;
     }
