@@ -22,16 +22,18 @@ function countryCodeToFlagEmoji(code: string | null): string {
   );
 }
 
-async function getTimezone(lat: number | undefined, lon: number | undefined) {
-  if (!lat || !lon) return undefined;
+async function getTimezone(lat?: number, lon?: number): Promise<string | null> {
+  if (lat == null || lon == null) return null;
   const url = `https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Erreur lors de la récupération du fuseau horaire");
   const data = await res.json();
-  return data.timeZone; // Exemple: "Europe/Paris"
+  return data.timeZone ?? null;
 }
 
 export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
+  const now = new Date().toLocaleString("fr-FR");
+
   const [timezoneId, country, slug, locality, countryCode] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
     getDataPayload<string>("location.country", false),
@@ -39,14 +41,18 @@ export async function execute({ interaction, message }: { interaction?: any; mes
     getDataPayload<string>("location.locality", false),
     getDataPayload<string>("location.country_code", false),
   ]);
-  const [maxLat, maxLon] = await Promise.all<any>([
+
+  const [maxLatStr, maxLonStr] = await Promise.all([
     getDataPayload<string>("location.lat", false),
     getDataPayload<string>("location.lon", false),
   ]);
 
-  // Normalisation pour éviter undefined
-  const fetchTz = maxLat || maxLon ? getTimezone(maxLat, maxLon) : null;
-  const tz = timezoneId ?? null;
+  const maxLat = maxLatStr ? Number(maxLatStr) : undefined;
+  const maxLon = maxLonStr ? Number(maxLonStr) : undefined;
+
+  // Récupération du fuseau horaire si nécessaire
+  const tz = timezoneId ?? (await getTimezone(maxLat, maxLon)) ?? null;
+
   const countryValue = country ?? "Lieu inconnu";
   const slugValue = slug ?? "";
   const localityValue = locality ?? "";
@@ -54,13 +60,13 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 
   const franceTime = DateTime.now().setZone("Europe/Paris");
   const maxTime = tz ? DateTime.now().setZone(tz) : null;
+
   const city =
     slugValue.length > 0 ? slugValue.replace(/^./, (s) => s.toUpperCase()) : localityValue || null;
-  const flag = countryCodeToFlagEmoji(cc);
 
+  const flag = countryCodeToFlagEmoji(cc);
   const diffHours = maxTime ? (maxTime.offset - franceTime.offset) / 60 : 0;
 
-  const now = new Date().toLocaleString("fr-FR");
   console.log(`📦 [${now}] (/maxtime) Données temps :`, {
     france: franceTime.toFormat("HH:mm"),
     max: maxTime?.toFormat("HH:mm") ?? "aucune donnée",
