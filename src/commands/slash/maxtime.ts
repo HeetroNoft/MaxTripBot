@@ -23,7 +23,8 @@ const countryCodeToFlagEmoji = (code?: string | null): string => {
 };
 
 export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
-  await interaction.deferReply();
+  if (interaction) await interaction.deferReply();
+
   const [timezoneId, country, slug, locality, countryCode, steps = []] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
     getDataPayload<string>("location.country", false),
@@ -72,6 +73,6 @@ export async function execute({ interaction, message }: { interaction?: any; mes
     )
     .setFooter({ text: "MaxTripBot • Time Info" });
 
-  const target = interaction ?? message;
-  if (target) await target.reply({ embeds: [embed] });
+  if (interaction) await interaction.editReply({ embeds: [embed] });
+  else if (message) await message.reply({ embeds: [embed] });
 }
