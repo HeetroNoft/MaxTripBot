@@ -23,16 +23,23 @@ function countryCodeToFlagEmoji(code: string | null): string {
 }
 
 export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
-  const [timezoneId, country, slug, locality, countryCode] = await Promise.all([
+  const [timezoneId, country, slug, locality, countryCode, steps] = await Promise.all([
     getDataPayload<string>("timezone_id", true),
-    getDataPayload<string>("location.country", true),
-    getDataPayload<string>("slug", true),
-    getDataPayload<string>("location.locality", true),
-    getDataPayload<string>("location.country_code", true),
+    getDataPayload<string>("location.country", false),
+    getDataPayload<string>("slug", false),
+    getDataPayload<string>("location.locality", false),
+    getDataPayload<string>("location.country_code", false),
+    getDataPayload<any>("steps", false),
   ]);
 
+  const latestStep = (steps || []).sort(
+    (a: any, b: any) =>
+      new Date(b.start_time || b.creation_time).getTime() -
+      new Date(a.start_time || a.creation_time).getTime()
+  )[0];
+
   // Normalisation pour éviter undefined
-  const tz = timezoneId ?? null;
+  const tz = timezoneId ?? latestStep.location.country == country ? latestStep.timezone_id : null;
   const locCountry = country ?? "Lieu inconnu";
   const slugValue = slug ?? "";
   const localityValue = locality ?? "";
