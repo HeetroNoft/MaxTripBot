@@ -32,17 +32,17 @@ async function getTimezone(lat: number | undefined, lon: number | undefined) {
 }
 
 export async function execute({ interaction, message }: { interaction?: any; message?: any }) {
-  const [timezoneId, country, slug, locality, countryCode, maxLat, maxLon] = await Promise.all<any>(
-    [
-      getDataPayload<string>("timezone_id", true),
-      getDataPayload<string>("location.country", false),
-      getDataPayload<string>("slug", false),
-      getDataPayload<string>("location.locality", false),
-      getDataPayload<string>("location.country_code", false),
-      getDataPayload<string>("location.lat", false),
-      getDataPayload<string>("location.lon", false),
-    ]
-  );
+  const [timezoneId, country, slug, locality, countryCode] = await Promise.all([
+    getDataPayload<string>("timezone_id", true),
+    getDataPayload<string>("location.country", false),
+    getDataPayload<string>("slug", false),
+    getDataPayload<string>("location.locality", false),
+    getDataPayload<string>("location.country_code", false),
+  ]);
+  const [maxLat, maxLon] = await Promise.all<any>([
+    getDataPayload<string>("location.lat", false),
+    getDataPayload<string>("location.lon", false),
+  ]);
 
   // Normalisation pour éviter undefined
   const fetchTz = maxLat || maxLon ? getTimezone(maxLat, maxLon) : null;
