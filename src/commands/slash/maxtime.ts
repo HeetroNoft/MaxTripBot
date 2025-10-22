@@ -59,6 +59,8 @@ export async function execute({ interaction, message }: { interaction?: any; mes
     diff: diffHours,
     flag,
     location: locCountry,
+    stepCountry,
+    country,
     city,
   });
 
