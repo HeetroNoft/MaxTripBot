@@ -36,7 +36,7 @@ function setDailyMaximeMessage(client: Client) {
 }
 
 async function checkNewStepInPayload(client: Client) {
-  cron.schedule("*/10 * * * *", async () => {
+  cron.schedule("*/60 * * * *", async () => {
     const now = new Date().toLocaleString("fr-FR");
     console.log(`🕗 [${now}] [CRON] Exécution de la mise à jour du payload...`);
 
