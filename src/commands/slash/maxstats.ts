@@ -21,10 +21,10 @@ export async function execute({ interaction, message }: { interaction?: any; mes
 
     // Récupération parallèle des données
     const [totalDistanceRaw, totalCountries, totalSteps, allFlags] = await Promise.all([
-      getDataPayload<number>("total_km"),
-      getDataPayload<number>("nb_country"),
-      getDataPayload<number>("nb_steps"),
-      getDataPayload<string[]>("flag_countries"),
+      getDataPayload<number>("total_km", false, true),
+      getDataPayload<number>("nb_country", false, false),
+      getDataPayload<number>("nb_steps", false, false),
+      getDataPayload<string[]>("flag_countries", false, false),
     ]);
 
     const totalDistance =
