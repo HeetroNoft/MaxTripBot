@@ -29,7 +29,16 @@ export async function updatePayload(): Promise<any | undefined> {
 
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--single-process",
+        "--disable-background-timer-throttling",
+        "--disable-renderer-backgrounding",
+        "--disable-backgrounding-occluded-windows",
+      ],
     });
     const page = await browser.newPage();
 
@@ -51,6 +60,7 @@ export async function updatePayload(): Promise<any | undefined> {
     // --- Navigation sécurisée ---
     await page.goto(tripUrl, { waitUntil: "networkidle2" });
     await new Promise((r) => setTimeout(r, 4000));
+    await page.close();
     await browser.close();
 
     const payload = payloads.map((p) => p?.trip || p).find((p) => p?.id === 22019906);
