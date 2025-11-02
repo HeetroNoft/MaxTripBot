@@ -5,27 +5,48 @@ import { DateTime, Zone } from "luxon";
 
 const TRIP_URL = process.env.TRIP_URL;
 const PAYLOAD_FILE = path.resolve("./data/payload.json");
-/**
- * updatePayload
- * Charge le payload depuis le fichier local ou via Puppeteer si nécessaire.
- */
-export async function updatePayload(): Promise<any | undefined> {
+
+interface Location {
+  locality?: string;
+  country?: string;
+  country_code?: string;
+}
+
+interface Step {
+  id?: number;
+  start_time?: string;
+  creation_time?: string;
+  location?: Location;
+  [key: string]: any;
+}
+
+interface ZeldaStep {
+  time: string;
+  location?: Location;
+  [key: string]: any;
+}
+
+interface Payload {
+  id?: number;
+  steps?: Step[];
+  zelda_steps?: ZeldaStep[];
+  last_modified?: string | null;
+  timezone_id?: string | Zone<boolean>;
+  [key: string]: any;
+}
+
+// --- updatePayload ---
+export async function updatePayload(): Promise<Payload | undefined> {
   try {
-    // Vérifie si le fichier local est récent (moins de 10 min)
     if (await fs.pathExists(PAYLOAD_FILE)) {
       const stats = await fs.stat(PAYLOAD_FILE);
-      const ageInMs = Date.now() - stats.mtime.getTime();
-      if (ageInMs < 1000 * 60 * 10) {
-        const localPayload = await fs.readJson(PAYLOAD_FILE);
-        return localPayload;
+      if (Date.now() - stats.mtime.getTime() < 10 * 60 * 1000) {
+        return await fs.readJson(PAYLOAD_FILE);
       }
     }
 
-    // --- 🔒 Vérification de TRIP_URL avant lancement ---
-    const tripUrl = process.env.TRIP_URL?.trim();
-    if (!tripUrl || !tripUrl.startsWith("http")) {
-      throw new Error(`❌ URL TRIP_URL invalide ou manquante: "${tripUrl}"`);
-    }
+    const tripUrl = TRIP_URL?.trim();
+    if (!tripUrl?.startsWith("http")) throw new Error(`URL TRIP_URL invalide: "${tripUrl}"`);
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -34,15 +55,17 @@ export async function updatePayload(): Promise<any | undefined> {
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
         "--disable-gpu",
+        "--disable-extensions",
         "--single-process",
         "--disable-background-timer-throttling",
         "--disable-renderer-backgrounding",
         "--disable-backgrounding-occluded-windows",
       ],
     });
+
     const page = await browser.newPage();
 
-    const payloads: any[] = [];
+    let payload: Payload | undefined;
 
     page.on("response", async (resp) => {
       try {
@@ -50,133 +73,77 @@ export async function updatePayload(): Promise<any | undefined> {
         if (!ct.includes("application/json")) return;
         const text = await resp.text();
         if (text.includes('"steps"') || text.includes('"trip"')) {
-          payloads.push(JSON.parse(text));
+          const parsed = JSON.parse(text);
+          if (!payload) payload = parsed?.trip || parsed;
         }
-      } catch (err) {
-        console.warn("Erreur interception JSON:", err);
-      }
+      } catch {}
     });
 
-    // --- Navigation sécurisée ---
     await page.goto(tripUrl, { waitUntil: "networkidle2" });
-    await new Promise((r) => setTimeout(r, 4000));
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // compatible TS strict
     await page.close();
     await browser.close();
 
-    const payload = payloads.map((p) => p?.trip || p).find((p) => p?.id === 22019906);
-
-    if (!payload) {
-      console.error("⚠️ Aucun payload trouvé pour le trip spécifié.");
-      return undefined;
-    }
+    if (!payload) return undefined;
 
     await fs.ensureDir("./data");
     await fs.writeJson(PAYLOAD_FILE, payload, { spaces: 2 });
-    console.log("💾 Payload sauvegardé localement.");
 
     return payload;
   } catch (err) {
-    console.error("❌ Erreur dans updatePayload:", err);
+    console.error("Erreur updatePayload:", err);
     return undefined;
   }
 }
 
-/**
- * getDataPayload
- * Récupère une clé spécifique depuis le payload.
- * @param dataPath Chemin dans le payload, ex: "location.full_detail"
- * @param latestOnly Si true, ne considère que la dernière step
- * @param refresh Si true, recharge le payload avant de récupérer les données
- */
+// --- getDataPayload ---
 export async function getDataPayload<T = unknown>(
   dataPath: string,
   latestOnly = false,
   refresh = true
 ): Promise<T | undefined> {
   try {
-    let payload = await fs.readJson(PAYLOAD_FILE);
-    if (refresh) payload = await updatePayload();
+    let payload: Payload | undefined = refresh
+      ? await updatePayload()
+      : await fs.readJson(PAYLOAD_FILE);
     if (!payload) return undefined;
 
-    let useZelda = false;
+    let target: any = payload;
 
-    let target = payload;
     if (latestOnly) {
-      const latestStep = (payload.steps || []).sort(
-        (a: any, b: any) =>
-          new Date(b.start_time || b.creation_time).getTime() -
-          new Date(a.start_time || a.creation_time).getTime()
-      )[0];
+      const steps: Step[] = payload.steps || [];
+      if (!steps.length) return undefined;
 
-      // Récupérer les coordonnées depuis la dernière step via getDataPayload
-      const lastStepLocality = latestStep.location.locality || null;
-      const zeldaSteps = (await payload.zelda_steps) || [];
+      const latestStep = steps.reduce((a: Step, b: Step) => {
+        const ta = new Date(a.start_time ?? a.creation_time ?? 0).getTime();
+        const tb = new Date(b.start_time ?? b.creation_time ?? 0).getTime();
+        return tb > ta ? b : a;
+      });
 
-      let latestZelda: any = null;
-      if (zeldaSteps.length > 0) {
-        latestZelda = zeldaSteps
-          .map((z: any) => ({ ...z, dt: DateTime.fromISO(z.time) }))
-          .sort((a: any, b: any) => b.dt.toMillis() - a.dt.toMillis())[0];
+      const zSteps: ZeldaStep[] = payload.zelda_steps || [];
+      const latestZelda: ZeldaStep | null = zSteps.length
+        ? zSteps.reduce((a: ZeldaStep, b: ZeldaStep) => {
+            const ta = DateTime.fromISO(a.time).toMillis();
+            const tb = DateTime.fromISO(b.time).toMillis();
+            return tb > ta ? b : a;
+          })
+        : null;
 
-        const latestZeldaLocality = latestZelda.location.locality || null;
+      const lastLocality = latestStep.location?.locality;
+      const zLocality = latestZelda?.location?.locality;
+      const useZelda = latestZelda && lastLocality !== zLocality;
 
-        if (lastStepLocality === latestZeldaLocality) {
-          useZelda = false;
-        } else {
-          useZelda = true;
-          /* console.warn("lastStepLocality !== latestZeldaLocality, utilisation de Zelda"); */
-        }
-      }
-      if (!latestStep) {
-        console.error("Aucune step trouvée.");
-        return undefined;
-      }
-
-      target = latestStep;
-      if (useZelda && latestZelda) {
-        target = latestZelda;
-      }
+      target = useZelda && latestZelda ? latestZelda : latestStep;
     }
 
-    // Gestion spéciale pour nb_country
-    if (!dataPath) {
-      console.error("Pas de clé demandée fournie à getDataPayload");
-      return undefined;
-    }
+    if (!dataPath) return undefined;
 
-    if (dataPath === "nb_country") {
-      return nbCountry(payload) as any;
-    }
+    if (dataPath === "nb_country") return nbCountry(payload) as any;
+    if (dataPath === "flag_countries") return flagCountries(payload) as any;
+    if (dataPath === "nb_steps") return payload.steps?.length as any;
+    if (dataPath === "timeSinceUpdate") return lastSinceUpdate(payload) as any;
 
-    if (dataPath === "flag_countries") {
-      return flagCountries(payload) as any;
-    }
-
-    if (dataPath === "nb_steps") {
-      return payload.steps.length as any;
-    }
-
-    if (dataPath === "timeSinceUpdate") {
-      return lastSinceUpdate(payload) as any;
-    }
-
-    if (dataPath == "start_time" && useZelda) {
-      dataPath = "time";
-    }
-
-    if (
-      useZelda &&
-      [
-        "media",
-        "display_name",
-        "creation_time",
-        "description",
-        "weather_temperature",
-        "screenshot_url",
-      ].includes(dataPath)
-    ) {
-      return undefined;
-    }
+    if (dataPath === "start_time" && target?.time) dataPath = "time";
 
     const keys = dataPath
       .replace(/\[(\w+)\]/g, ".$1")
@@ -185,73 +152,45 @@ export async function getDataPayload<T = unknown>(
     let result: any = target;
 
     for (const key of keys) {
-      if (result && key in result) {
-        result = result[key];
-      } else {
-        console.error(`Clé non trouvée: ${key}`);
-        return undefined;
-      }
+      if (result?.[key] !== undefined) result = result[key];
+      else return undefined;
     }
 
     return result as T;
   } catch (err) {
-    console.error("Erreur dans getDataPayload:", err);
+    console.error("Erreur getDataPayload:", err);
     return undefined;
   }
 }
 
-function nbCountry(payload: { zelda_steps: any[] }): number {
-  const zSteps = payload.zelda_steps || [];
-  const countries = new Set<string>();
-  for (const step of zSteps) {
-    const country = step?.location?.country;
-    if (country && country !== "") countries.add(country);
-  }
-  return countries.size as any;
+// --- Helpers ---
+function nbCountry(payload: Payload): number {
+  return new Set((payload.zelda_steps || []).map((s) => s?.location?.country).filter(Boolean)).size;
 }
 
-function flagCountries(payload: { zelda_steps: any[] }): string {
-  const zSteps = payload.zelda_steps || [];
-  const countries = new Set<string>();
-
-  for (const step of zSteps) {
-    const countryCode = step?.location?.country_code;
-    // Vérification : au moins une lettre et aucun chiffre
-    if (countryCode && /^[A-Za-z]+$/.test(countryCode) && countryCode.length >= 1) {
-      countries.add(countryCode.toUpperCase());
-    }
-  }
-
-  const flags = [...countries]
-    .map((countryCode) => {
-      const codePoints = [...countryCode].map((char) => 0x1f1e6 + char.charCodeAt(0) - 65);
-      return String.fromCodePoint(...codePoints);
-    })
+function flagCountries(payload: Payload): string {
+  const codes = new Set(
+    (payload.zelda_steps || [])
+      .map((s) => s?.location?.country_code)
+      .filter((c): c is string => typeof c === "string" && /^[A-Za-z]+$/.test(c))
+      .map((c) => c.toUpperCase())
+  );
+  return [...codes]
+    .map((c) => [...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65))
+    .map((arr) => String.fromCodePoint(...arr))
     .join(" ");
-
-  return flags as any;
 }
 
-function lastSinceUpdate(payload: {
-  last_modified: null;
-  timezone_id: string | Zone<boolean> | undefined;
-}): string {
-  const lastModified = payload.last_modified || (null as any);
-
-  const last = DateTime.fromISO(lastModified, {
-    zone: payload.timezone_id,
-  });
-  const now = DateTime.now().setZone(payload.timezone_id);
-
-  const diff = now.diff(last, ["days", "hours", "minutes"]).toObject();
-
-  if (diff.days && diff.days >= 1) {
-    return `${Math.floor(diff.days)}j` as any;
-  } else if (diff.hours && diff.hours >= 1) {
-    return `${Math.floor(diff.hours)}h` as any;
-  } else if (diff.minutes && diff.minutes >= 1) {
-    return `${Math.floor(diff.minutes)}min` as any;
-  } else {
-    return "quelques secondes" as any;
-  }
+function lastSinceUpdate(payload: Payload): string {
+  const last = payload.last_modified
+    ? DateTime.fromISO(payload.last_modified, { zone: payload.timezone_id })
+    : DateTime.now();
+  const diff = DateTime.now()
+    .setZone(payload.timezone_id)
+    .diff(last, ["days", "hours", "minutes"])
+    .toObject();
+  if (diff.days && diff.days >= 1) return `${Math.floor(diff.days)}j`;
+  if (diff.hours && diff.hours >= 1) return `${Math.floor(diff.hours)}h`;
+  if (diff.minutes && diff.minutes >= 1) return `${Math.floor(diff.minutes)}min`;
+  return "quelques secondes";
 }
